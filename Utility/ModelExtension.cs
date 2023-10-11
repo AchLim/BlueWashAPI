@@ -43,10 +43,9 @@ namespace PurchaseAPI.Utility
             passedVendor.VendorSalesEmail = vendor.VendorSalesEmail;
             passedVendor.BankAccountId = vendor.BankAccountId;
             passedVendor.CurrencyId = vendor.CurrencyId;
-            passedVendor.AccountPayable = vendor.AccountPayable;
         }
 
-        public static void PassValues(this PurchaseOrder po, ref PurchaseOrder passedPo)
+        public static void PassValues(this Receipt po, ref Receipt passedPo)
         {
             passedPo.Name = po.Name;
             passedPo.Date = po.Date;
@@ -55,49 +54,12 @@ namespace PurchaseAPI.Utility
             passedPo.TaxInclusive = po.TaxInclusive;
             passedPo.CurrencyId = po.CurrencyId;
             passedPo.TotalAmount = po.TotalAmount;
-            passedPo.PurchaseOrderLines = po.PurchaseOrderLines;
+            passedPo.ReceiptLines = po.ReceiptLines;
         }
 
         public static bool IsNotEmpty<T>(this ICollection<T>? collections)
         {
             return collections != null && collections.Count > 0;
-        }
-
-        public static PurchaseOrder Convert(this PurchaseOrderDto purchaseOrderDto)
-        {
-            PurchaseOrder po = new()
-            {
-                Name = purchaseOrderDto.Name,
-                VendorId = purchaseOrderDto.VendorId,
-                VendorReference = purchaseOrderDto.VendorReference,
-                Date = purchaseOrderDto.Date,
-                CurrencyId = purchaseOrderDto.CurrencyId,
-                TaxInclusive = purchaseOrderDto.TaxInclusive,
-                TotalAmount = purchaseOrderDto.TotalAmount,
-            };
-
-
-
-            if (purchaseOrderDto.PurchaseOrderLines.IsNotEmpty())
-            {
-                po.PurchaseOrderLines = new List<PurchaseOrderLine>();
-                foreach (var line in purchaseOrderDto.PurchaseOrderLines!)
-                {
-                    PurchaseOrderLine pol = new()
-                    {
-                        PurchaseOrderId = line.PurchaseOrderId,
-                        ProductId = line.ProductId,
-                        UnitOfMeasureId = line.UnitOfMeasureId,
-                        Date = line.Date,
-                        UnitPrice = line.UnitPrice,
-                        Subtotal = line.Subtotal,
-                    };
-
-                    po.PurchaseOrderLines.Add(pol);
-                }
-            }
-
-            return po;
         }
     }
 }
