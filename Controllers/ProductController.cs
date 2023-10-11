@@ -58,7 +58,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPost("insert_product")]
+        [HttpPost("insert")]
         public async Task<ActionResult<Product>> PostProduct(ProductDto productDto)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -82,26 +82,29 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPut("update_product/{id}")]
-        public async Task<ActionResult<Product>> UpdateProduct(int id, Product product)
+        [HttpPut("update/{id}")]
+        public async Task<ActionResult<Product>> UpdateProduct(int id, ProductUpdateDto productUpdateDto)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    if (id != product.Id)
+                    if (id != productUpdateDto.Id)
                         return BadRequest("Product ID mismatch!");
 
-                    Product? productToUpdate = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+                    Product? productToUpdate = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
                     if (productToUpdate == null)
                         return NotFound("Product is not found!");
 
-                    product.PassValues(ref productToUpdate);
+                    var productMapper = new ProductMapper();
+                    Product product = productMapper.ProductUpdateDtoToProduct(productUpdateDto);
+
+                    _context.Products.Update(product);
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    return CreatedAtAction(nameof(GetProductById), new { id = productToUpdate.Id }, productToUpdate);
+                    return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
                 }
                 catch (Exception ex)
                 {
@@ -110,7 +113,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpDelete("delete_product/{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<ActionResult> DeleteProduct(int id)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())

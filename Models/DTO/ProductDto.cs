@@ -7,4 +7,11 @@ namespace PurchaseAPI.Models.DTO
         public string Name { get; set; }
         public int UnitOfMeasureId { get; set; }
     }
+
+    public class ProductUpdateDto
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+        public int UnitOfMeasureId { get; set; }
+    }
 }
