@@ -59,7 +59,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPost("insert_bank")]
+        [HttpPost("insert")]
         public async Task<ActionResult<Bank>> PostBank(BankDto bankDto)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -83,7 +83,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPut("update_bank/{id}")]
+        [HttpPut("update/{id}")]
         public async Task<ActionResult<Bank>> UpdateBank(int id, Bank bank)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -93,11 +93,11 @@ namespace PurchaseAPI.Controllers
                     if (id != bank.Id)
                         return BadRequest("Bank ID mismatch!");
 
-                    Bank? bankToUpdate = await _context.Banks.FirstOrDefaultAsync(b => b.Id == id);
+                    Bank? bankToUpdate = await _context.Banks.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
                     if (bankToUpdate == null)
                         return NotFound("Bank not found!");
 
-                    bank.PassValues(ref bankToUpdate);
+                    _context.Banks.Update(bank);
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
@@ -111,7 +111,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpDelete("delete_bank/{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<ActionResult> DeleteBank(int id)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
