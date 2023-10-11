@@ -47,6 +47,7 @@ namespace PurchaseAPI.Utility
 
         public static void PassValues(this Receipt po, ref Receipt passedPo)
         {
+            passedPo.Id = po.Id;
             passedPo.Name = po.Name;
             passedPo.Date = po.Date;
             passedPo.VendorId = po.VendorId;
@@ -54,6 +55,7 @@ namespace PurchaseAPI.Utility
             passedPo.TaxInclusive = po.TaxInclusive;
             passedPo.CurrencyId = po.CurrencyId;
             passedPo.TotalAmount = po.TotalAmount;
+            passedPo.PurposeOfPurchase = po.PurposeOfPurchase;
             passedPo.ReceiptLines = po.ReceiptLines;
         }
 

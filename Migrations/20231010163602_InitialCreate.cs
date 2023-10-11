@@ -105,8 +105,7 @@ namespace PurchaseAPI.Migrations
                     VendorEmail = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: true),
                     VendorSalesEmail = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: true),
                     BankAccountId = table.Column<int>(type: "int", nullable: true),
-                    CurrencyId = table.Column<int>(type: "int", nullable: true),
-                    AccountPayable = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
+                    CurrencyId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -124,30 +123,31 @@ namespace PurchaseAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PurchaseOrders",
+                name: "Receipts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: false),
                     VendorId = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     VendorReference = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     CurrencyId = table.Column<int>(type: "int", nullable: false),
                     TaxInclusive = table.Column<bool>(type: "bit", nullable: false),
+                    PurposeOfPurchase = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PurchaseOrders", x => x.Id);
+                    table.PrimaryKey("PK_Receipts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PurchaseOrders_Currencies_CurrencyId",
+                        name: "FK_Receipts_Currencies_CurrencyId",
                         column: x => x.CurrencyId,
                         principalTable: "Currencies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PurchaseOrders_Vendors_VendorId",
+                        name: "FK_Receipts_Vendors_VendorId",
                         column: x => x.VendorId,
                         principalTable: "Vendors",
                         principalColumn: "Id",
@@ -155,34 +155,36 @@ namespace PurchaseAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PurchaseOrderLines",
+                name: "ReceiptLines",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PurchaseOrderId = table.Column<int>(type: "int", nullable: false),
+                    ReceiptId = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     UnitOfMeasureId = table.Column<int>(type: "int", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    DiscountRate = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     Subtotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PurchaseOrderLines", x => x.Id);
+                    table.PrimaryKey("PK_ReceiptLines", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PurchaseOrderLines_Products_ProductId",
+                        name: "FK_ReceiptLines_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_PurchaseOrderLines_PurchaseOrders_PurchaseOrderId",
-                        column: x => x.PurchaseOrderId,
-                        principalTable: "PurchaseOrders",
+                        name: "FK_ReceiptLines_Receipts_ReceiptId",
+                        column: x => x.ReceiptId,
+                        principalTable: "Receipts",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_PurchaseOrderLines_UnitOfMeasures_UnitOfMeasureId",
+                        name: "FK_ReceiptLines_UnitOfMeasures_UnitOfMeasureId",
                         column: x => x.UnitOfMeasureId,
                         principalTable: "UnitOfMeasures",
                         principalColumn: "Id");
@@ -223,28 +225,28 @@ namespace PurchaseAPI.Migrations
                 column: "UnitOfMeasureId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PurchaseOrderLines_ProductId",
-                table: "PurchaseOrderLines",
+                name: "IX_ReceiptLines_ProductId",
+                table: "ReceiptLines",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PurchaseOrderLines_PurchaseOrderId",
-                table: "PurchaseOrderLines",
-                column: "PurchaseOrderId");
+                name: "IX_ReceiptLines_ReceiptId",
+                table: "ReceiptLines",
+                column: "ReceiptId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PurchaseOrderLines_UnitOfMeasureId",
-                table: "PurchaseOrderLines",
+                name: "IX_ReceiptLines_UnitOfMeasureId",
+                table: "ReceiptLines",
                 column: "UnitOfMeasureId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PurchaseOrders_CurrencyId",
-                table: "PurchaseOrders",
+                name: "IX_Receipts_CurrencyId",
+                table: "Receipts",
                 column: "CurrencyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PurchaseOrders_VendorId",
-                table: "PurchaseOrders",
+                name: "IX_Receipts_VendorId",
+                table: "Receipts",
                 column: "VendorId");
 
             migrationBuilder.CreateIndex(
@@ -268,13 +270,13 @@ namespace PurchaseAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "PurchaseOrderLines");
+                name: "ReceiptLines");
 
             migrationBuilder.DropTable(
                 name: "Products");
 
             migrationBuilder.DropTable(
-                name: "PurchaseOrders");
+                name: "Receipts");
 
             migrationBuilder.DropTable(
                 name: "UnitOfMeasures");

@@ -12,8 +12,8 @@ using PurchaseAPI.Data;
 namespace PurchaseAPI.Migrations
 {
     [DbContext(typeof(PurchaseDbContext))]
-    [Migration("20231009144249_v1")]
-    partial class v1
+    [Migration("20231010163602_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,7 +124,7 @@ namespace PurchaseAPI.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("PurchaseAPI.Models.PurchaseOrder", b =>
+            modelBuilder.Entity("PurchaseAPI.Models.Receipt", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,10 +167,10 @@ namespace PurchaseAPI.Migrations
 
                     b.HasIndex("VendorId");
 
-                    b.ToTable("PurchaseOrders");
+                    b.ToTable("Receipts");
                 });
 
-            modelBuilder.Entity("PurchaseAPI.Models.PurchaseOrderLine", b =>
+            modelBuilder.Entity("PurchaseAPI.Models.ReceiptLine", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -182,7 +182,6 @@ namespace PurchaseAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("DiscountRate")
@@ -192,12 +191,12 @@ namespace PurchaseAPI.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PurchaseOrderId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Quantity")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ReceiptId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Subtotal")
                         .HasPrecision(18, 2)
@@ -214,11 +213,11 @@ namespace PurchaseAPI.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("PurchaseOrderId");
+                    b.HasIndex("ReceiptId");
 
                     b.HasIndex("UnitOfMeasureId");
 
-                    b.ToTable("PurchaseOrderLines");
+                    b.ToTable("ReceiptLines");
                 });
 
             modelBuilder.Entity("PurchaseAPI.Models.UnitOfMeasure", b =>
@@ -249,10 +248,6 @@ namespace PurchaseAPI.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AccountPayable")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Address")
                         .HasMaxLength(120)
@@ -320,7 +315,7 @@ namespace PurchaseAPI.Migrations
                     b.Navigation("UnitOfMeasure");
                 });
 
-            modelBuilder.Entity("PurchaseAPI.Models.PurchaseOrder", b =>
+            modelBuilder.Entity("PurchaseAPI.Models.Receipt", b =>
                 {
                     b.HasOne("PurchaseAPI.Models.Currency", "Currency")
                         .WithMany()
@@ -339,16 +334,16 @@ namespace PurchaseAPI.Migrations
                     b.Navigation("Vendor");
                 });
 
-            modelBuilder.Entity("PurchaseAPI.Models.PurchaseOrderLine", b =>
+            modelBuilder.Entity("PurchaseAPI.Models.ReceiptLine", b =>
                 {
                     b.HasOne("PurchaseAPI.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .IsRequired();
 
-                    b.HasOne("PurchaseAPI.Models.PurchaseOrder", "PurchaseOrder")
-                        .WithMany("PurchaseOrderLines")
-                        .HasForeignKey("PurchaseOrderId")
+                    b.HasOne("PurchaseAPI.Models.Receipt", "Receipt")
+                        .WithMany("ReceiptLines")
+                        .HasForeignKey("ReceiptId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
@@ -359,7 +354,7 @@ namespace PurchaseAPI.Migrations
 
                     b.Navigation("Product");
 
-                    b.Navigation("PurchaseOrder");
+                    b.Navigation("Receipt");
 
                     b.Navigation("UnitOfMeasure");
                 });
@@ -379,9 +374,9 @@ namespace PurchaseAPI.Migrations
                     b.Navigation("Currency");
                 });
 
-            modelBuilder.Entity("PurchaseAPI.Models.PurchaseOrder", b =>
+            modelBuilder.Entity("PurchaseAPI.Models.Receipt", b =>
                 {
-                    b.Navigation("PurchaseOrderLines");
+                    b.Navigation("ReceiptLines");
                 });
 #pragma warning restore 612, 618
         }

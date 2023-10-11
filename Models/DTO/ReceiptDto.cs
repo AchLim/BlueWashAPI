@@ -4,21 +4,21 @@ using System.Text.Json.Serialization;
 
 namespace PurchaseAPI.Models.DTO
 {
-    public class PurchaseOrderDto
+    public class ReceiptDto
     {
         public string Name { get; set; }
         public int VendorId { get; set; }
         public DateTime Date { get; set; }
         public string? VendorReference { get; set; }
-        public virtual ICollection<PurchaseOrderLineDto>? PurchaseOrderLines { get; set; }
+        public virtual ICollection<ReceiptLineDto>? ReceiptLines { get; set; }
         public int CurrencyId { get; set; }
         public bool TaxInclusive { get; set; }
         public decimal TotalAmount { get; set; }
     }
 
-    public class PurchaseOrderLineDto
+    public class ReceiptLineDto
     {
-        public virtual int PurchaseOrderId { get; set; }
+        public virtual int ReceiptId { get; set; }
         public DateTime Date { get; set; }
         public virtual int ProductId { get; set; }
         public decimal Quantity { get; set; }
