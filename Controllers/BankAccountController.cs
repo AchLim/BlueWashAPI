@@ -58,7 +58,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPost("insert_bank_account")]
+        [HttpPost("insert")]
         public async Task<ActionResult<BankAccount>> PostBankAccount(BankAccountDto bankAccountDto)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -82,26 +82,29 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPut("update_bank_account/{id}")]
-        public async Task<ActionResult<BankAccount>> UpdateBankAccount(int id, BankAccount bankAccount)
+        [HttpPut("update/{id}")]
+        public async Task<ActionResult<BankAccount>> UpdateBankAccount(int id, BankAccountUpdateDto bankAccountUpdateDto)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    if (id != bankAccount.Id)
+                    if (id != bankAccountUpdateDto.Id)
                         return BadRequest("Bank Account ID mismatch!");
 
-                    BankAccount? bankAccountToUpdate = await _context.BankAccounts.Include(ba => ba.BankId).FirstOrDefaultAsync(b => b.Id == id);
+                    BankAccount? bankAccountToUpdate = await _context.BankAccounts.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
                     if (bankAccountToUpdate == null)
                         return NotFound("Bank Account is not found!");
 
-                    bankAccount.PassValues(ref bankAccountToUpdate);
+                    var bankAccountMapper = new BankAccountMapper();
+                    BankAccount bankAccount = bankAccountMapper.BankAccountUpdateDtoToBankAccount(bankAccountUpdateDto);
+
+                    _context.BankAccounts.Update(bankAccount);
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    return CreatedAtAction(nameof(GetBankAccountById), new { id = bankAccountToUpdate.Id }, bankAccountToUpdate);
+                    return CreatedAtAction(nameof(GetBankAccountById), new { id = bankAccount.Id }, bankAccount);
                 }
                 catch (Exception ex)
                 {
@@ -110,7 +113,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpDelete("delete_bank_account/{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<ActionResult> DeleteBankAccount(int id)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
