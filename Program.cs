@@ -12,6 +12,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: AllowedOrigins, policy =>
     {
         policy.WithOrigins("http://localhost:5173");
+        policy.WithHeaders(new[] { "Content-Type" });
     });
 });
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
@@ -21,7 +22,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 builder.Services.AddDbContext<PurchaseDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("PurchaseDatabase")
-        ?? throw new InvalidOperationException("Connection string: 'PurchaseDatabase' not found!"));
+        ?? throw new InvalidOperationException("Database 'PurchaseDatabase' tidak ditemukan!"));
 
     options.EnableSensitiveDataLogging();
 });
