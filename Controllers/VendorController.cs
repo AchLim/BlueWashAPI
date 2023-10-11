@@ -31,6 +31,7 @@ namespace PurchaseAPI.Controllers
                 {
                     var vendors = await _context.Vendors
                                                 .Include(v => v.BankAccount)
+                                                .ThenInclude(ba => ba != null ? ba.Bank : null)
                                                 .Include(v => v.Currency)
                                                 .ToListAsync();
                     await transaction.CommitAsync();
@@ -52,6 +53,7 @@ namespace PurchaseAPI.Controllers
                 {
                     var vendor = await _context.Vendors
                                                 .Include(v => v.BankAccount)
+                                                .ThenInclude(ba => ba != null ? ba.Bank : null)
                                                 .Include(v => v.Currency).Where(v => v.Id == id).FirstOrDefaultAsync();
                     await transaction.CommitAsync();
 
@@ -64,7 +66,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPost("insert_vendor")]
+        [HttpPost("insert")]
         public async Task<ActionResult<Vendor>> PostVendor(VendorDto vendorDto)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -88,26 +90,29 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPut("update_vendor/{id}")]
-        public async Task<ActionResult<Vendor>> UpdateVendor(int id, Vendor vendor)
+        [HttpPut("update/{id}")]
+        public async Task<ActionResult<Vendor>> UpdateVendor(int id, VendorUpdateDto vendorUpdateDto)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    if (id != vendor.Id)
+                    if (id != vendorUpdateDto.Id)
                         return BadRequest("Vendor ID mismatch!");
 
-                    Vendor? vendorToUpdate = await _context.Vendors.FirstOrDefaultAsync(v => v.Id == id);
+                    Vendor? vendorToUpdate = await _context.Vendors.AsNoTracking().FirstOrDefaultAsync(v => v.Id == id);
                     if (vendorToUpdate == null)
                         return NotFound("Vendor is not found!");
 
-                    vendor.PassValues(ref vendorToUpdate);
+                    var vendorMapper = new VendorMapper();
+                    Vendor vendor = vendorMapper.VendorUpdateDtoToVendor(vendorUpdateDto);
+
+                    _context.Vendors.Update(vendor);
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    return CreatedAtAction(nameof(GetVendorById), new { id = vendorToUpdate.Id }, vendorToUpdate);
+                    return CreatedAtAction(nameof(GetVendorById), new { id = vendor.Id }, vendor);
                 }
                 catch (Exception ex)
                 {
@@ -116,7 +121,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpDelete("delete_vendor/{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<ActionResult> DeleteVendor(int id)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())

@@ -50,9 +50,5 @@ namespace PurchaseAPI.Models
         [JsonIgnore]
         public Currency? Currency { get; set; }
         public int? CurrencyId { get; set; }
-
-        [Display(Name = "Utang")]
-        [Precision(18, 2)]
-        public decimal AccountPayable { get; set; }
     }
 }
