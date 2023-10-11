@@ -29,9 +29,11 @@ namespace PurchaseAPI.Controllers
                 try
                 {
                     var receipts = await _context.Receipts
-                                                .Include(r => r.Vendor)
-                                                .Include(r => r.Currency)
-                                                //.Include(po => po.ReceiptLines)
+                                                .Include(receipt => receipt.Vendor)
+                                                .Include(receipt => receipt.Currency)
+                                                .Include(receipt => receipt.ReceiptLines)
+                                                .ThenInclude(rl => rl.Product)
+                                                .ThenInclude(rl => rl.UnitOfMeasure)
                                                 .ToListAsync();
                     await transaction.CommitAsync();
                     return receipts == null ? NotFound(receipts) : Ok(receipts);
@@ -53,7 +55,9 @@ namespace PurchaseAPI.Controllers
                     var receipt = await _context.Receipts
                                             .Include(receipt => receipt.Vendor)
                                             .Include(receipt => receipt.Currency)
-                                            //.Include(receipt => receipt.PurchaseOrderLines)
+                                            .Include(receipt => receipt.ReceiptLines)
+                                            .ThenInclude(rl => rl.Product)
+                                            .ThenInclude(rl => rl.UnitOfMeasure)
                                             .Where(receipt => receipt.Id == id).FirstOrDefaultAsync();
                     await transaction.CommitAsync();
 
@@ -91,23 +95,24 @@ namespace PurchaseAPI.Controllers
         }
 
         [HttpPut("update/{id}")]
-        public async Task<ActionResult<Receipt>> UpdateReceipt(int id, Receipt receipt)
+        public async Task<ActionResult<Receipt>> UpdateReceipt(int id, ReceiptUpdateDto receiptUpdateDto)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    if (id != receipt.Id)
+                    if (id != receiptUpdateDto.Id)
                         return BadRequest("Receipt ID mismatch!");
 
-                    Receipt? receiptToUpdate = await _context.Receipts
-                                                                //.Include(receipt => receipt.PurchaseOrderLines)
-                                                                //.Include(receipt => receipt.VendorId)
-                                                                .FirstOrDefaultAsync(receipt => receipt.Id == id);
+                    Receipt? receiptToUpdate = await _context.Receipts.Include(receipt => receipt.ReceiptLines).FirstOrDefaultAsync(receipt => receipt.Id == id);
                     if (receiptToUpdate == null)
                         return NotFound("Receipt is not found!");
 
-                    _context.Receipts.Update(receipt);
+                    ReceiptMapper receiptMapper = new();
+                    Receipt receipt = receiptMapper.ReceiptUpdateDtoToReceipt(receiptUpdateDto);
+                    receipt.PassValues(ref receiptToUpdate);
+
+                    _context.Receipts.Update(receiptToUpdate);
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
@@ -128,11 +133,11 @@ namespace PurchaseAPI.Controllers
             {
                 try
                 {
-                    Receipt? poToDelete = await _context.Receipts.FirstOrDefaultAsync(po => po.Id == id);
-                    if (poToDelete == null)
+                    Receipt? receiptToDelete = await _context.Receipts.Include(receipt => receipt.ReceiptLines).FirstOrDefaultAsync(receipt => receipt.Id == id);
+                    if (receiptToDelete == null)
                         return NotFound("Receipt is not found!");
 
-                    _context.Receipts.Remove(poToDelete);
+                    _context.Receipts.Remove(receiptToDelete);
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();

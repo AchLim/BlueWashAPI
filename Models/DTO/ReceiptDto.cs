@@ -6,7 +6,7 @@ namespace PurchaseAPI.Models.DTO
 {
     public class ReceiptDto
     {
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public int VendorId { get; set; }
         public DateTime Date { get; set; }
         public string? VendorReference { get; set; }
@@ -14,6 +14,7 @@ namespace PurchaseAPI.Models.DTO
         public int CurrencyId { get; set; }
         public bool TaxInclusive { get; set; }
         public decimal TotalAmount { get; set; }
+        public string? PurposeOfPurchase { get; set; }
     }
 
     public class ReceiptLineDto
@@ -25,5 +26,22 @@ namespace PurchaseAPI.Models.DTO
         public virtual int UnitOfMeasureId { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal Subtotal { get; set; }
+        public decimal DiscountRate { get; set; }
+        public string? Description { get; set; }
+    }
+
+
+    public class ReceiptUpdateDto
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+        public int VendorId { get; set; }
+        public DateTime Date { get; set; }
+        public string? VendorReference { get; set; }
+        public virtual ICollection<ReceiptLineDto>? ReceiptLines { get; set; }
+        public int CurrencyId { get; set; }
+        public bool TaxInclusive { get; set; }
+        public decimal TotalAmount { get; set; }
+        public string? PurposeOfPurchase { get; set; }
     }
 }

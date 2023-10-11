@@ -134,7 +134,7 @@ namespace PurchaseAPI.Migrations
                     VendorReference = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     CurrencyId = table.Column<int>(type: "int", nullable: false),
                     TaxInclusive = table.Column<bool>(type: "bit", nullable: false),
-                    PurposeOfPurchase = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PurposeOfPurchase = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>

@@ -141,7 +141,6 @@ namespace PurchaseAPI.Migrations
                         .HasColumnType("nvarchar(60)");
 
                     b.Property<string>("PurposeOfPurchase")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TaxInclusive")

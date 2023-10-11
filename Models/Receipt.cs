@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PurchaseAPI.Models
 {
-    public class PurchaseOrder
+    public class Receipt
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -29,8 +29,8 @@ namespace PurchaseAPI.Models
         [StringLength(20)]
         public string? VendorReference { get; set; }
 
-        [Display(Name = "Detail Pesanan Pembelian")]
-        public virtual ICollection<PurchaseOrderLine>? PurchaseOrderLines { get; set; }
+        [Display(Name = "Detail Struk")]
+        public virtual ICollection<ReceiptLine>? ReceiptLines { get; set; }
 
         [Required]
         [Display(Name = "Mata Uang")]
@@ -42,15 +42,15 @@ namespace PurchaseAPI.Models
         [Display(Name = "Pajak Termasuk")]
         public bool TaxInclusive { get; set; }
 
-        [Display(Name = "Purpose of Purchase")]
-        public string PurposeOfPurchase { get; set; }
+        [Display(Name = "Tujuan Pembelian")]
+        public string? PurposeOfPurchase { get; set; }
 
         [Display(Name = "Total")]
         [Precision(18, 2)]
         public decimal TotalAmount { get; set; }
     }
 
-    public class PurchaseOrderLine
+    public class ReceiptLine
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -58,16 +58,16 @@ namespace PurchaseAPI.Models
         [Required]
         [DeleteBehavior(DeleteBehavior.ClientCascade)]
         [Display(Name = "Pesanan Pembelian")]
-        public virtual PurchaseOrder PurchaseOrder { get; set; }
+        public virtual Receipt Receipt { get; set; }
 
-        public required int PurchaseOrderId { get; set; }
+        public required int ReceiptId { get; set; }
 
         [DataType(DataType.Date)]
         [Display(Name = "Tanggal")]
         public DateTime Date { get; set; }
 
         [Display(Name = "Deskripsi")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Required]
         [Display(Name = "Barang")]
