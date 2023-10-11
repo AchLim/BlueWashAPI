@@ -58,7 +58,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPost("insert_currency")]
+        [HttpPost("insert")]
         public async Task<ActionResult<Currency>> PostCurrency(CurrencyDto currencyDto)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -82,7 +82,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPut("update_currency/{id}")]
+        [HttpPut("update/{id}")]
         public async Task<ActionResult<Currency>> UpdateCurrency(int id, Currency currency)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -92,16 +92,16 @@ namespace PurchaseAPI.Controllers
                     if (id != currency.Id)
                         return BadRequest("Currency ID mismatch!");
 
-                    Currency? currencyToUpdate = await _context.Currencies.FirstOrDefaultAsync(c => c.Id == id);
+                    Currency? currencyToUpdate = await _context.Currencies.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
                     if (currencyToUpdate == null)
                         return NotFound("Currency is not found!");
 
-                    currency.PassValues(ref currencyToUpdate);
+                    _context.Currencies.Update(currency);
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    return CreatedAtAction(nameof(GetCurrencyById), new { id = currencyToUpdate.Id }, currencyToUpdate);
+                    return CreatedAtAction(nameof(GetCurrencyById), new { id = currency.Id }, currency);
                 }
                 catch (Exception ex)
                 {
@@ -110,7 +110,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpDelete("delete_currency/{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<ActionResult> DeleteCurrency(int id)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
