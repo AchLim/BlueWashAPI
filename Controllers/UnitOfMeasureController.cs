@@ -58,7 +58,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPost("insert_unit_of_measure")]
+        [HttpPost("insert")]
         public async Task<ActionResult<UnitOfMeasure>> PostUnitOfMeasure(UnitOfMeasureDto unitOfMeasureDto)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -82,7 +82,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpPut("update_unit_of_measure/{id}")]
+        [HttpPut("update/{id}")]
         public async Task<ActionResult<UnitOfMeasure>> UpdateProduct(int id, UnitOfMeasure uom)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -92,16 +92,16 @@ namespace PurchaseAPI.Controllers
                     if (id != uom.Id)
                         return BadRequest("Unit Of Measure ID mismatch!");
 
-                    UnitOfMeasure? uomToUpdate = await _context.UnitOfMeasures.FirstOrDefaultAsync(uom => uom.Id == id);
+                    UnitOfMeasure? uomToUpdate = await _context.UnitOfMeasures.AsNoTracking().FirstOrDefaultAsync(uom => uom.Id == id);
                     if (uomToUpdate == null)
                         return NotFound("Unit Of Measure is not found!");
 
-                    uom.PassValues(ref uomToUpdate);
+                    _context.UnitOfMeasures.Update(uom);
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    return CreatedAtAction(nameof(GetUnitOfMeasureById), new { id = uomToUpdate.Id }, uomToUpdate);
+                    return CreatedAtAction(nameof(GetUnitOfMeasureById), new { id = uom.Id }, uom);
                 }
                 catch (Exception ex)
                 {
@@ -110,7 +110,7 @@ namespace PurchaseAPI.Controllers
             }
         }
 
-        [HttpDelete("delete_unit_of_measure/{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<ActionResult> DeleteUnitOfMeasure(int id)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
