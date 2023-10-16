@@ -6,6 +6,6 @@ Includes:
 - Bank Account
 - Currency
 - Product
-- Purchase Order
+- Receipt
 - Unit of Measure
 - Vendor
