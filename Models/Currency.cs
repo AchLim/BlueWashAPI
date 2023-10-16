@@ -1,21 +1,27 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI.Models.Common;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PurchaseAPI.Models
+namespace WebAPI.Models
 {
-    public class Currency
+    [Table("currency")]
+    [Index(nameof(Name), new string[] { nameof(Code), nameof(CultureName) }, IsUnique = true)]
+    public class Currency : AuditableEntity
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
         [Required]
-        [StringLength(40)]
+        [StringLength(60, MinimumLength = 1)]
         [Display(Name = "Nama")]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
 
         [Required]
-        [StringLength(10)]
+        [StringLength(3, MinimumLength = 3)]
         [Display(Name = "Kode")]
-        public string Abbreviation { get; set; }
+        public string Code { get; set; } = default!;
+
+        [Required]
+        [StringLength(20, MinimumLength = 1)]
+        [Display(Name = "Culture Name")]
+        public string CultureName { get; set; } = default!;
     }
 }

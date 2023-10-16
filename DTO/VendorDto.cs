@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace PurchaseAPI.Models.DTO
+namespace WebAPI.Models.DTO
 {
     public class VendorDto
     {

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace PurchaseAPI.Models.DTO
+namespace WebAPI.Models.DTO
 {
     public class ReceiptDto
     {

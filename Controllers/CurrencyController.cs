@@ -1,35 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using PurchaseAPI.Data;
-using PurchaseAPI.Models;
-using PurchaseAPI.Models.DTO;
-using PurchaseAPI.Models.Mapper;
-using PurchaseAPI.Utility;
+using Microsoft.EntityFrameworkCore.Storage;
+using WebAPI.DAL;
+using WebAPI.Data;
+using WebAPI.Models;
+using WebAPI.Models.DTO;
+using WebAPI.Models.Mapper;
+using WebAPI.Utility;
 
-namespace PurchaseAPI.Controllers
+namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class CurrencyController : ControllerBase
     {
         private readonly ILogger<CurrencyController> _logger;
-        private readonly PurchaseDbContext _context;
+        private readonly IRepository<Currency> _currencyRepository;
 
-        public CurrencyController(ILogger<CurrencyController> logger, PurchaseDbContext context)
+        public CurrencyController(ILogger<CurrencyController> logger, IRepository<Currency> currencyRepository)
         {
             _logger = logger;
-            _context = context;
+            _currencyRepository = currencyRepository;
         }
 
         [HttpGet("all")]
         public async Task<ActionResult<Currency>> GetAllCurrencies()
         {
-            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            await using (var transaction = await _currencyRepository.UnitOfWork.BeginTransactionAsync())
             {
                 try
                 {
-                    var currencies = await _context.Currencies.ToListAsync();
-                    await transaction.CommitAsync();
+                    var currencies = await _currencyRepository.GetAll().ToListAsync();
+                    await _currencyRepository.UnitOfWork.CommitAsync(transaction);
                     return currencies == null ? NotFound(currencies) : Ok(currencies);
                 }
                 catch (Exception ex)
@@ -40,14 +43,14 @@ namespace PurchaseAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Currency>> GetCurrencyById(int id)
+        public async Task<ActionResult<Currency>> GetCurrencyById(Guid id)
         {
-            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            await using (var transaction = await _currencyRepository.UnitOfWork.BeginTransactionAsync())
             {
                 try
                 {
-                    var currency = await _context.Currencies.Where(c => c.Id == id).FirstOrDefaultAsync();
-                    await transaction.CommitAsync();
+                    var currency = await _currencyRepository.GetByIdAsync(id);
+                    await _currencyRepository.UnitOfWork.CommitAsync(transaction);
 
                     return currency == null ? NotFound(currency) : Ok(currency);
                 }
@@ -59,19 +62,16 @@ namespace PurchaseAPI.Controllers
         }
 
         [HttpPost("insert")]
-        public async Task<ActionResult<Currency>> PostCurrency(CurrencyDto currencyDto)
+        public async Task<ActionResult<Currency>> PostCurrency([FromBody] CurrencyDto currencyDto)
         {
-            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            await using (var transaction = await _currencyRepository.UnitOfWork.BeginTransactionAsync())
             {
                 try
                 {
                     var currencyMapper = new CurrencyMapper();
                     Currency currency = currencyMapper.CurrencyDtoToCurrency(currencyDto);
-
-                    _context.Currencies.Add(currency);
-                    await _context.SaveChangesAsync();
-
-                    await transaction.CommitAsync();
+                    await _currencyRepository.AddAsync(currency);
+                    await _currencyRepository.UnitOfWork.CommitAsync(transaction);
 
                     return CreatedAtAction(nameof(GetCurrencyById), new { id = currency.Id }, currency);
                 }
@@ -83,23 +83,23 @@ namespace PurchaseAPI.Controllers
         }
 
         [HttpPut("update/{id}")]
-        public async Task<ActionResult<Currency>> UpdateCurrency(int id, Currency currency)
+        public async Task<ActionResult<Currency>> UpdateCurrency(Guid id, [FromBody] CurrencyUpdateDto currencyDto)
         {
-            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            await using (var transaction = await _currencyRepository.UnitOfWork.BeginTransactionAsync())
             {
                 try
                 {
-                    if (id != currency.Id)
-                        return BadRequest("Currency ID mismatch!");
+                    if (id != currencyDto.Id)
+                        return BadRequest("ID Mata Uang tidak cocok!");
 
-                    Currency? currencyToUpdate = await _context.Currencies.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
-                    if (currencyToUpdate == null)
-                        return NotFound("Currency is not found!");
+                    Currency? currency = await _currencyRepository.GetByIdAsync(id);
+                    if (currency == null)
+                        return NotFound("Mata Uang tidak ditemukan!");
 
-                    _context.Currencies.Update(currency);
+                    currencyDto.PassData(ref currency);
 
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                    await _currencyRepository.UpdateAsync(currency);
+                    await _currencyRepository.UnitOfWork.CommitAsync(transaction);
 
                     return CreatedAtAction(nameof(GetCurrencyById), new { id = currency.Id }, currency);
                 }
@@ -113,18 +113,16 @@ namespace PurchaseAPI.Controllers
         [HttpDelete("delete/{id}")]
         public async Task<ActionResult> DeleteCurrency(int id)
         {
-            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            await using (var transaction = await _currencyRepository.UnitOfWork.BeginTransactionAsync())
             {
                 try
                 {
-                    Currency? currencyToDelete = await _context.Currencies.FirstOrDefaultAsync(c => c.Id == id);
-                    if (currencyToDelete == null)
+                    Currency? currency = await _currencyRepository.GetByIdAsync(id);
+                    if (currency == null)
                         return NotFound("Currency is not found!");
 
-                    _context.Currencies.Remove(currencyToDelete);
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                    await _currencyRepository.DeleteAsync(currency);
+                    await _currencyRepository.UnitOfWork.CommitAsync(transaction);
 
                     return NoContent();
                 }

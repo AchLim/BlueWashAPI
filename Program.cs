@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using PurchaseAPI.Data;
+using WebAPI.DAL;
+using WebAPI.Data;
+using WebAPI.Interceptors;
+using WebAPI.Models;
 using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,13 +22,21 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
-builder.Services.AddDbContext<PurchaseDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("PurchaseDatabase")
-        ?? throw new InvalidOperationException("Database 'PurchaseDatabase' tidak ditemukan!"));
 
-    options.EnableSensitiveDataLogging();
+builder.Services.AddDbContext<ApplicationContext>((sp, options) =>
+{
+    //var auditableInterceptor = sp.GetService<UpdateEntityInterceptor>()!;
+
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AppDatabase")
+                        ?? throw new InvalidOperationException("Database 'AppDatabase' tidak ditemukan!")
+                        )
+            //.AddInterceptors(auditableInterceptor)
+            .EnableSensitiveDataLogging();
 });
+
+//builder.Services.AddSingleton<UpdateEntityInterceptor>();
+builder.Services.AddTransient(typeof(IRepository<>), typeof(BaseRepository<>));
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
