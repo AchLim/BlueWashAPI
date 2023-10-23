@@ -2,21 +2,20 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
-EXPOSE 8004
-EXPOSE 4434
+EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["PurchaseAPI.csproj", "."]
-RUN dotnet restore "./PurchaseAPI.csproj"
+COPY ["WebAPI.csproj", "."]
+RUN dotnet restore "./WebAPI.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "PurchaseAPI.csproj" -c Release -o /app/build
+RUN dotnet build "WebAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "PurchaseAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "WebAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "PurchaseAPI.dll"]
+ENTRYPOINT ["dotnet", "WebAPI.dll"]
