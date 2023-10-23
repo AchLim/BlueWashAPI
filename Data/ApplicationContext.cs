@@ -1,5 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.InteropServices;
+using System.Security.Claims;
+using System.Security.Principal;
 using WebAPI.DAL;
 using WebAPI.Models;
 using WebAPI.Models.Common;
@@ -7,26 +13,23 @@ using WebAPI.Utility;
 
 namespace WebAPI.Data
 {
-    public class ApplicationContext : DbContext, IUnitOfWork
+    public class ApplicationContext : DbContext
     {
-        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) { }
+        public readonly IHttpContextAccessor _httpContext;
+        public ApplicationContext(DbContextOptions<ApplicationContext> options, IHttpContextAccessor httpContext) : base(options)
+        {
+            _httpContext = httpContext;
+        }
+
+        #region Override Methods
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AuditableEntity>().UseTpcMappingStrategy();
-
-            modelBuilder.Entity<AuditableEntity>()
-                        .Property(a => a.Created).HasDefaultValueSql("GETDATE()");
-
-            modelBuilder.Entity<AuditableEntity>()
-                        .Property(a => a.LastModified).ValueGeneratedOnAddOrUpdate()
-                        .Metadata.SetAfterSaveBehavior(Microsoft.EntityFrameworkCore.Metadata.PropertySaveBehavior.Save);
-
-            modelBuilder.Seed();
+            modelBuilder.SeedCurrency();
+            modelBuilder.SeedChartOfAccount();
 
             base.OnModelCreating(modelBuilder);
         }
-
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
             configurationBuilder.Properties<DateOnly>()
@@ -39,68 +42,45 @@ namespace WebAPI.Data
 
             base.ConfigureConventions(configurationBuilder);
         }
-
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
+            var currentTime = DateTime.UtcNow;
+            string? userName = string.Empty;
+            if (_httpContext.HttpContext is not null && _httpContext.HttpContext.User.Claims is not null)
+            {
+                IEnumerable<Claim> claims = _httpContext.HttpContext.User.Claims;
+                foreach (var claim in claims)
+                {
+                    if (claim.Type == JwtRegisteredClaimNames.Name)
+                    {
+                        userName = claim.Value;
+                    }
+                }
+            }
+
+            foreach (var entry in ChangeTracker.Entries<IAuditable>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.Created = currentTime;
+                    entry.Entity.CreatedBy = userName;
+                }
+
+                entry.Entity.LastModified = currentTime;
+                entry.Entity.LastModifiedBy = userName;
+            }
+
             var result = await base.SaveChangesAsync(cancellationToken);
 
             return result;
         }
+       
+        #endregion
 
-        private IDbContextTransaction? _currentTransaction = null;
-        public IDbContextTransaction? GetCurrentTransaction() => _currentTransaction;
-        public bool HasActiveTransaction => _currentTransaction != null;
-
-        public async Task<IDbContextTransaction> BeginTransactionAsync()
-        {
-            if (_currentTransaction != null) return null!;
-
-            _currentTransaction = await Database.BeginTransactionAsync();
-
-            return _currentTransaction;
-        }
-
-        public async Task CommitAsync(IDbContextTransaction transaction)
-        {
-            if (transaction == null) throw new ArgumentNullException(nameof(transaction));
-            if (transaction != _currentTransaction) throw new InvalidOperationException($"Transaction {transaction.TransactionId} is not current");
-
-            try
-            {
-                await SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch
-            {
-                RollbackTransaction();
-                throw;
-            }
-            finally
-            {
-                if (_currentTransaction != null)
-                {
-                    _currentTransaction.Dispose();
-                    _currentTransaction = null!;
-                }
-            }
-        }
-
-        private void RollbackTransaction()
-        {
-            try
-            {
-                _currentTransaction?.Rollback();
-            }
-            finally
-            {
-                if (_currentTransaction != null)
-                {
-                    _currentTransaction.Dispose();
-                    _currentTransaction = null!;
-                }
-            }
-        }
-
+        #region Database Sets
+        public DbSet<ApplicationUser> Users { get; set; }
+        public DbSet<ApplicationRole> Roles { get; set; }
+        public DbSet<ApplicationUserRole> UserRoles { get; set; }
         public DbSet<ChartOfAccount> ChartOfAccounts { get; set; } = default!;
         public DbSet<Currency> Currencies { get; set; } = default!;
         public DbSet<Customer> Customers { get; set; } = default!;
@@ -113,5 +93,7 @@ namespace WebAPI.Data
         public DbSet<SalesHeader> SalesHeaders { get; set; } = default!;
         public DbSet<SalesPayment> SalesPayments { get; set; } = default!;
         public DbSet<Supplier> Suppliers { get; set; } = default!;
+
+        #endregion
     }
 }

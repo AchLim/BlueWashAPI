@@ -7,15 +7,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace WebAPI.Models
 {
     [Table("general_account_detail")]
-    public class GeneralAccountDetail : AuditableEntity
+    [PrimaryKey(nameof(GeneralAccountHeaderId), nameof(GeneralAccountDetailId))]
+    public class GeneralAccountDetail : IAuditable
     {
+        [Column(Order = 0)]
+        public Guid GeneralAccountHeaderId { get; set; }
+
+        [Column(Order = 1)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid GeneralAccountDetailId { get; set; }
+
         [Required]
         public virtual GeneralAccountHeader GeneralAccountHeader { get; set; } = default!;
-        public Guid GeneralAccountHeaderId { get; set; }
 
         [DisplayName("Nomor Transaksi")]
         public string TransactionNo => GeneralAccountHeader.TransactionNo;
-
 
 
         [Required]
@@ -33,5 +39,11 @@ namespace WebAPI.Models
         [Precision(19, 4)]
         [DisplayName("Credit")]
         public decimal Credit { get; set; }
+
+        // Auditable
+        public DateTime? Created { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? LastModified { get; set; }
+        public string? LastModifiedBy { get; set; }
     }
 }

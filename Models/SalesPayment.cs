@@ -7,11 +7,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace WebAPI.Models
 {
     [Table("sales_payment")]
-    public class SalesPayment : AuditableEntity
+    [PrimaryKey(nameof(SalesPaymentId), nameof(SalesHeaderId))]
+    public class SalesPayment : IAuditable
     {
+        [Key]
+        [Column(Order = 0)]
+        public Guid SalesHeaderId { get; set; }
+
+        [Key]
+        [Column(Order = 1)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid SalesPaymentId { get; set; }
+
         [Required]
         public virtual SalesHeader SalesHeader { get; set; } = default!;
-        public Guid SalesHeaderId { get; set; }
 
         [DisplayName("Nomor Penjualan")]
         public string SalesNo => SalesHeader.SalesNo;
@@ -23,5 +32,11 @@ namespace WebAPI.Models
         [DisplayName("Jumlah")]
         public decimal Amount { get; set; }
 
+
+        // Auditable
+        public DateTime? Created { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? LastModified { get; set; }
+        public string? LastModifiedBy { get; set; }
     }
 }

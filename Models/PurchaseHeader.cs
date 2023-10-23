@@ -9,8 +9,11 @@ namespace WebAPI.Models
 {
     [Table("purchase_header")]
     [Index(nameof(PurchaseNo), IsUnique = true)]
-    public class PurchaseHeader : AuditableEntity, IValidatableObject
+    public class PurchaseHeader : IValidatableObject, IAuditable
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
+
         [Required]
         [StringLength(80, MinimumLength = 1, ErrorMessage = "Nomor Pembelian tidak boleh kosong.")]
         [DisplayName("Nomor Pembelian")]
@@ -36,6 +39,11 @@ namespace WebAPI.Models
         public virtual Currency? Currency { get; set; }
         public Guid? CurrencyId { get; set; }
 
+        // Auditable
+        public DateTime? Created { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? LastModified { get; set; }
+        public string? LastModifiedBy { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

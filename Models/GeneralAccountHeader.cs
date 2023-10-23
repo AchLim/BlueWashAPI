@@ -9,8 +9,11 @@ namespace WebAPI.Models
 {
     [Table("general_account_header")]
     [Index(nameof(TransactionNo), IsUnique = true)]
-    public class GeneralAccountHeader : AuditableEntity
+    public class GeneralAccountHeader : IAuditable
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
+
         [Required]
         [StringLength(80, MinimumLength = 1, ErrorMessage = "Nomor Transaksi tidak boleh kosong.")]
         [DisplayName("Nomor Transaksi")]
@@ -25,5 +28,11 @@ namespace WebAPI.Models
 
         // FK - General Account Detail
         public ICollection<GeneralAccountDetail>? GeneralAccountDetails { get; set; }
+
+        // Auditable
+        public DateTime? Created { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? LastModified { get; set; }
+        public string? LastModifiedBy { get; set; }
     }
 }

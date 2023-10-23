@@ -8,8 +8,11 @@ namespace WebAPI.Models
 {
     [Table("customer")]
     [Index(nameof(CustomerCode), IsUnique = true)]
-    public class Customer : AuditableEntity
+    public class Customer : IAuditable
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
+
         [Required]
         [StringLength(60, MinimumLength = 1, ErrorMessage = "Kode Pelanggan tidak boleh kosong.")]
         [DisplayName("Kode Pelanggan")]
@@ -30,5 +33,11 @@ namespace WebAPI.Models
 
         // FK - Sales Detail
         public ICollection<SalesHeader>? SalesHeaders { get; set; }
+
+        // Auditable
+        public DateTime? Created { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? LastModified { get; set; }
+        public string? LastModifiedBy { get; set; }
     }
 }

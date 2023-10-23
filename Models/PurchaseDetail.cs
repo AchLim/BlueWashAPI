@@ -7,11 +7,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace WebAPI.Models
 {
     [Table("purchase_detail")]
-    public class PurchaseDetail : AuditableEntity
+    [PrimaryKey(nameof(PurchaseHeaderId), nameof(PurchaseDetailId))]
+    public class PurchaseDetail : IAuditable
     {
+        [Column(Order = 0)]
+        public Guid PurchaseHeaderId { get; set; }
+
+        [Column(Order = 1)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid PurchaseDetailId { get; set; }
+
         [Required]
         public virtual PurchaseHeader PurchaseHeader { get; set; } = default!;
-        public Guid PurchaseHeaderId { get; set; }
 
         [DisplayName("Nomor Pembelian")]
         public string PurchaseNo => PurchaseHeader.PurchaseNo;
@@ -31,5 +38,11 @@ namespace WebAPI.Models
         [Precision(19, 4)]
         [DisplayName("Harga")]
         public decimal Price { get; set; }
+
+        // Auditable
+        public DateTime? Created { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? LastModified { get; set; }
+        public string? LastModifiedBy { get; set; }
     }
 }

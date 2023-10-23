@@ -8,8 +8,11 @@ namespace WebAPI.Models
 {
     [Table("inventory")]
     [Index(nameof(ItemNo), IsUnique = true)]
-    public class Inventory : AuditableEntity
+    public class Inventory : IAuditable
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
+
         [Required]
         [StringLength(80, MinimumLength = 1, ErrorMessage = "Nomor Barang tidak boleh kosong.")]
         [DisplayName("Nomor Barang")]
@@ -20,14 +23,16 @@ namespace WebAPI.Models
         [DisplayName("Name Barang")]
         public string ItemName { get; set; } = default!;
 
-        [Precision(19, 4)]
-        [DisplayName("Harga Barang")]
-        public decimal ItemPrice { get; set; }
-
         // FK - Purchase Detail
         public ICollection<PurchaseDetail>? PurchaseDetails { get; set; }
 
         // FK - Sales Detail
         public ICollection<SalesDetail>? SalesDetails { get; set; }
+
+        // Auditable
+        public DateTime? Created { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? LastModified { get; set; }
+        public string? LastModifiedBy { get; set; }
     }
 }

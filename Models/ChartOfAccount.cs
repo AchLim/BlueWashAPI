@@ -8,8 +8,11 @@ namespace WebAPI.Models
 {
     [Table("chart_of_account")]
     [Index(nameof(AccountNo), IsUnique = true)]
-    public class ChartOfAccount : AuditableEntity
+    public class ChartOfAccount : IAuditable
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
+
         [DisplayName("Nomor Header Akun")]
         public int AccountHeaderNo { get; set; }
 
@@ -32,5 +35,11 @@ namespace WebAPI.Models
 
         // FK - General Account Detail
         public ICollection<GeneralAccountDetail>? GeneralAccountDetails { get; set; }
+
+        // Auditable
+        public DateTime? Created { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? LastModified { get; set; }
+        public string? LastModifiedBy { get; set; }
     }
 }
