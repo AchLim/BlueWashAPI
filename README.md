@@ -2,10 +2,18 @@
 REST API for Purchase Web
 
 Includes:
-- Bank
-- Bank Account
+- User
+- Role
+- User Role
+- Chart of Account
 - Currency
-- Product
-- Receipt
-- Unit of Measure
-- Vendor
+- Customer
+- General Account Header
+- General Account Detail
+- Inventory
+- Purchase Header
+- Purchase Detail
+- Sales Header
+- Sales Detail
+- Sales Payment
+- Supplier
