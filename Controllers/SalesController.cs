@@ -26,8 +26,40 @@ namespace WebAPI.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<SalesReportContainer>> GetSalesReport()
         {
-            IEnumerable<SalesReportContainer> salesReport = await _salesRepository.GetSalesReport();
+            IEnumerable<SalesReportContainer> salesReport = await _salesRepository.GetSalesData();
             return Ok(salesReport);
+        }
+
+        [HttpGet("get_total_item_sales")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ItemSalesContainer>> GetTotalItemSales()
+        {
+            IEnumerable<ItemSalesContainer> totalItemSales = await _salesRepository.GetTotalItemSalesData();
+            return Ok(totalItemSales);
+        }
+
+        [HttpGet("get_total_sales_per_invoice")]
+        [AllowAnonymous]
+        public async Task<ActionResult<SalesPerInvoiceContainer>> GetTotalSalesPerInvoice()
+        {
+            IEnumerable<SalesPerInvoiceContainer> salesPerInvoices = await _salesRepository.GetTotalSalesPerInvoiceData();
+            return Ok(salesPerInvoices);
+        }
+
+        [HttpGet("get_total_sales_payment")]
+        [AllowAnonymous]
+        public async Task<ActionResult<SalesPaymentContainer>> GetTotalSalesPayment()
+        {
+            IEnumerable<SalesPaymentContainer> totalSalesPayment = await _salesRepository.GetTotalSalesPaymentData();
+            return Ok(totalSalesPayment);
+        }
+
+        [HttpGet("get_ar_balance_report")]
+        [AllowAnonymous]
+        public async Task<ActionResult<AccountReceivableBalanceContainer>> GetAccountReceivableBalanceReport()
+        {
+            IEnumerable<AccountReceivableBalanceContainer> accountReceivableBalanceReport = await _salesRepository.GetAccountReceivableBalanceData();
+            return Ok(accountReceivableBalanceReport);
         }
 
         //[HttpGet("all")]
