@@ -15,7 +15,7 @@ namespace WebAPI.Data
 {
     public class ApplicationContext : DbContext
     {
-        public readonly IHttpContextAccessor _httpContext;
+        private readonly IHttpContextAccessor _httpContext;
         public ApplicationContext(DbContextOptions<ApplicationContext> options, IHttpContextAccessor httpContext) : base(options)
         {
             _httpContext = httpContext;
