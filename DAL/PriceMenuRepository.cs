@@ -7,103 +7,103 @@ using WebAPI.Models.Mapper;
 
 namespace WebAPI.DAL
 {
-    public sealed class CurrencyRepository : ICurrencyRepository
+    public sealed class PriceMenuRepository : IPriceMenuRepository
     {
         private readonly ApplicationContext _context;
 
-        public CurrencyRepository(ApplicationContext context)
+        public PriceMenuRepository(ApplicationContext context)
         {
             _context = context;
         }
 
-        public async Task<IEnumerable<Currency>> GetAllCurrencies()
+        public async Task<IEnumerable<PriceMenu>> GetAllPriceMenus()
         {
-            IEnumerable<Currency> currencies = Enumerable.Empty<Currency>();
+            IEnumerable<PriceMenu> priceMenus = Enumerable.Empty<PriceMenu>();
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    currencies = await _context.Currencies.ToListAsync();
+                    priceMenus = await _context.PriceMenus.ToListAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data Mata Uang", ex);
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data menu harga", ex);
                 }
             }
 
-            return currencies;
+            return priceMenus;
         }
 
-        public async Task<Currency?> GetCurrencyById(Guid id)
+        public async Task<PriceMenu?> GetPriceMenuById(Guid id)
         {
-            Currency? currency = null;
+            PriceMenu? priceMenu = null;
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    currency = await _context.Currencies.FindAsync(id);
+                    priceMenu = await _context.PriceMenus.FindAsync(id);
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException($"Terjadi kesalahan dalam pengambilan data Mata Uang dengan id: {id}", ex);
+                    throw new DatabaseReadException($"Terjadi kesalahan dalam pengambilan data menu harga dengan id: {id}", ex);
                 }
             }
 
-            return currency;
+            return priceMenu;
         }
 
-        public async Task InsertCurrency(Currency currency)
+        public async Task InsertPriceMenu(PriceMenu priceMenu)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    await _context.Currencies.AddAsync(currency);
+                    await _context.PriceMenus.AddAsync(priceMenu);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseInsertException($"Terjadi kesalahan dalam menambahkan data Mata Uang dengan nama: {currency.Name}", ex);
+                    throw new DatabaseInsertException($"Terjadi kesalahan dalam menambahkan data menu harga dengan nama: {priceMenu.Name}", ex);
                 }
             }
         }
 
-        public async Task UpdateCurrency(Currency currency)
+        public async Task UpdatePriceMenu(PriceMenu priceMenu)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    _context.Currencies.Update(currency);
+                    _context.PriceMenus.Update(priceMenu);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseUpdateException($"Terjadi kesalahan dalam memperbarui data Mata Uang dengan nama: {currency.Name}", ex);
+                    throw new DatabaseUpdateException($"Terjadi kesalahan dalam memperbarui data menu harga dengan nama: {priceMenu.Name}", ex);
                 }
             }
         }
 
-        public async Task DeleteCurrency(Currency currency)
+        public async Task DeletePriceMenu(PriceMenu priceMenu)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    _context.Currencies.Remove(currency);
+                    _context.PriceMenus.Remove(priceMenu);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseDeleteException($"Terjadi kesalahan dalam menghapus data Mata Uang dengan id: {currency.Id}", ex);
+                    throw new DatabaseDeleteException($"Terjadi kesalahan dalam menghapus data menu harga dengan id: {priceMenu.PriceMenuId}", ex);
                 }
             }
         }

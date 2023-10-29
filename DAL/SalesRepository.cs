@@ -5,7 +5,7 @@ using WebAPI.Models;
 
 namespace WebAPI.DAL
 {
-    public class SalesRepository : ISalesRepository
+    public sealed class SalesRepository : ISalesRepository
     {
         private readonly ApplicationContext _context;
 
@@ -26,7 +26,7 @@ namespace WebAPI.DAL
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan laporan penjualan per invoice.", ex);
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data penjualan barang.", ex);
                 }
             }
 
@@ -45,7 +45,7 @@ namespace WebAPI.DAL
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan laporan pembayaran penjualan.", ex);
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data pembayaran penjualan.", ex);
                 }
             }
 
@@ -63,7 +63,7 @@ namespace WebAPI.DAL
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan laporan penjualan per invoice.", ex);
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data penjualan per invoice.", ex);
                 }
             }
 
@@ -82,7 +82,7 @@ namespace WebAPI.DAL
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan laporan saldo piutang.", ex);
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data saldo piutang.", ex);
                 }
             }
 
@@ -130,18 +130,18 @@ namespace WebAPI.DAL
                                     (customerSalesHeader, detail) => new
                                     {
                                         SalesNo = customerSalesHeader.SalesNo,
-                                        InventoryId = detail.InventoryId,
+                                        PriceMenuId = detail.PriceMenuId,
                                         Quantity = detail.Quantity,
                                         Price = detail.Price,
                                         Subtotal = detail.Quantity * detail.Price
                                     })
-                            .Join(_context.Inventories,
-                                    customerHeaderDetail => customerHeaderDetail.InventoryId,
-                                    inventory => inventory.Id,
-                                    (customerHeaderDetail, inventories) => new
+                            .Join(_context.PriceMenus,
+                                    customerHeaderDetail => customerHeaderDetail.PriceMenuId,
+                                    priceMenu => priceMenu.PriceMenuId,
+                                    (customerHeaderDetail, priceMenus) => new
                                     {
                                         SalesNo = customerHeaderDetail.SalesNo,
-                                        ItemNo = inventories.ItemNo,
+                                        MenuName = priceMenus.Name,
                                         Quantity = customerHeaderDetail.Quantity,
                                         Price = customerHeaderDetail.Price,
                                         Subtotal = customerHeaderDetail.Subtotal
@@ -149,7 +149,7 @@ namespace WebAPI.DAL
                             .GroupBy(result => new
                             {
                                 result.SalesNo,
-                                result.ItemNo,
+                                result.MenuName,
                                 result.Quantity,
                                 result.Price,
                                 result.Subtotal
@@ -157,7 +157,7 @@ namespace WebAPI.DAL
                             .Select(group => new ItemSalesContainer
                             {
                                 SalesNo = group.Key.SalesNo,
-                                ItemNo = group.Key.ItemNo,
+                                MenuName = group.Key.MenuName,
                                 Quantity = group.Key.Quantity,
                                 Price = group.Key.Price,
                                 Subtotal = group.Key.Subtotal
@@ -285,7 +285,7 @@ namespace WebAPI.DAL
                                                             SalesNo = header.SalesNo,
                                                             SalesDate = header.SalesDate,
                                                             Description = header.Description,
-                                                            InventoryNo = detail != null ? (string?)detail.Inventory.ItemNo : null,
+                                                            MenuName = detail != null ? (string?)detail.PriceMenu.Name : null,
                                                             Quantity = detail != null ? (decimal?)detail.Quantity : null,
                                                             Price = detail != null ? (decimal?)detail.Price : null,
                                                             Total = detail != null ? (decimal?)(detail.Quantity * detail.Price) : null,
@@ -295,7 +295,7 @@ namespace WebAPI.DAL
                                                 SalesNo = result.SalesNo,
                                                 SalesDate = result.SalesDate,
                                                 Description = result.Description,
-                                                InventoryNo = result.InventoryNo,
+                                                MenuName = result.MenuName,
                                                 Quantity = result.Quantity,
                                                 Price = result.Price,
                                             })
@@ -304,7 +304,7 @@ namespace WebAPI.DAL
                                                 SalesNo = data.Key.SalesNo,
                                                 SalesDate = data.Key.SalesDate,
                                                 Description = data.Key.Description,
-                                                InventoryNo = data.Key.InventoryNo,
+                                                MenuName = data.Key.MenuName,
                                                 Quantity = data.Key.Quantity ?? 0,
                                                 Price = data.Key.Price ?? 0,
                                                 Total = data.Sum(item => item.Total) ?? 0,
@@ -316,22 +316,22 @@ namespace WebAPI.DAL
     public class ItemSalesContainer
     {
         public string SalesNo { get; set; } = default!;
-        public string ItemNo { get; set; } = default!;
+        public string MenuName { get; set; } = default!;
 
-        [Precision(19, 2)]
+        [Precision(19, 3)]
         public decimal Quantity { get; set; }
 
-        [Precision(19, 2)]
+        [Precision(19, 3)]
         public decimal Price { get; set; }
 
-        [Precision(19, 2)]
+        [Precision(19, 3)]
         public decimal Subtotal { get; set; }
     }
     public class SalesPaymentContainer
     {
         public string SalesNo { get; set; } = default!;
 
-        [Precision(19, 2)]
+        [Precision(19, 3)]
         public decimal SumOfAmount { get; set; }
     }
     public class SalesReportContainer
@@ -339,15 +339,15 @@ namespace WebAPI.DAL
         public string SalesNo { get; set; } = default!;
         public DateOnly SalesDate { get; set; }
         public string? Description { get; set; }
-        public string? InventoryNo { get; set; }
+        public string? MenuName { get; set; }
 
-        [Precision(19, 2)]
+        [Precision(19, 3)]
         public decimal Quantity { get; set; }
 
-        [Precision(19, 2)]
+        [Precision(19, 3)]
         public decimal Price { get; set; }
 
-        [Precision(19, 2)]
+        [Precision(19, 3)]
         public decimal Total { get; set; }
     }
 
@@ -358,7 +358,7 @@ namespace WebAPI.DAL
         public string CustomerCode { get; set; } = default!;
         public string CustomerName { get; set; } = default!;
 
-        [Precision(19, 2)]
+        [Precision(19, 3)]
         public decimal SumOfSubtotal { get; set; }
     }
 

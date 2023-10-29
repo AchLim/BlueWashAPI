@@ -7,103 +7,103 @@ using WebAPI.Models.Mapper;
 
 namespace WebAPI.DAL
 {
-    public sealed class CurrencyRepository : ICurrencyRepository
+    public sealed class LaundryServiceRepository : ILaundryServiceRepository
     {
         private readonly ApplicationContext _context;
 
-        public CurrencyRepository(ApplicationContext context)
+        public LaundryServiceRepository(ApplicationContext context)
         {
             _context = context;
         }
 
-        public async Task<IEnumerable<Currency>> GetAllCurrencies()
+        public async Task<IEnumerable<LaundryService>> GetAllLaundryServices()
         {
-            IEnumerable<Currency> currencies = Enumerable.Empty<Currency>();
+            IEnumerable<LaundryService> laundryServices = Enumerable.Empty<LaundryService>();
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    currencies = await _context.Currencies.ToListAsync();
+                    laundryServices = await _context.LaundryServices.ToListAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data Mata Uang", ex);
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data Laundry Service", ex);
                 }
             }
 
-            return currencies;
+            return laundryServices;
         }
 
-        public async Task<Currency?> GetCurrencyById(Guid id)
+        public async Task<LaundryService?> GetLaundryServiceById(Guid id)
         {
-            Currency? currency = null;
+            LaundryService? laundryService = null;
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    currency = await _context.Currencies.FindAsync(id);
+                    laundryService = await _context.LaundryServices.FindAsync(id);
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException($"Terjadi kesalahan dalam pengambilan data Mata Uang dengan id: {id}", ex);
+                    throw new DatabaseReadException($"Terjadi kesalahan dalam pengambilan data Laundry Service dengan id: {id}", ex);
                 }
             }
 
-            return currency;
+            return laundryService;
         }
 
-        public async Task InsertCurrency(Currency currency)
+        public async Task InsertLaundryService(LaundryService laundryService)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    await _context.Currencies.AddAsync(currency);
+                    await _context.LaundryServices.AddAsync(laundryService);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseInsertException($"Terjadi kesalahan dalam menambahkan data Mata Uang dengan nama: {currency.Name}", ex);
+                    throw new DatabaseInsertException($"Terjadi kesalahan dalam menambahkan data Laundry Service dengan nama: {laundryService.Name}", ex);
                 }
             }
         }
 
-        public async Task UpdateCurrency(Currency currency)
+        public async Task UpdateLaundryService(LaundryService laundryService)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    _context.Currencies.Update(currency);
+                    _context.LaundryServices.Update(laundryService);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseUpdateException($"Terjadi kesalahan dalam memperbarui data Mata Uang dengan nama: {currency.Name}", ex);
+                    throw new DatabaseUpdateException($"Terjadi kesalahan dalam memperbarui data Service Laundry dengan nama: {laundryService.Name}", ex);
                 }
             }
         }
 
-        public async Task DeleteCurrency(Currency currency)
+        public async Task DeleteLaundryService(LaundryService laundryService)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    _context.Currencies.Remove(currency);
+                    _context.LaundryServices.Remove(laundryService);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseDeleteException($"Terjadi kesalahan dalam menghapus data Mata Uang dengan id: {currency.Id}", ex);
+                    throw new DatabaseDeleteException($"Terjadi kesalahan dalam menghapus data Service Laundry dengan id: {laundryService.Id}", ex);
                 }
             }
         }
