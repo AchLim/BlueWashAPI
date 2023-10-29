@@ -68,8 +68,12 @@ builder.Services.AddTransient<IJwtProvider, JwtProvider>();
 builder.Services.ConfigureOptions<JwtOptionsSetup>();
 builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
 
+builder.Services.AddScoped<ILaundryServiceRepository, LaundryServiceRepository>();
+builder.Services.AddScoped<IPriceMenuRepository, PriceMenuRepository>();
 builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 builder.Services.AddScoped<ISalesRepository, SalesRepository>();
+builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
+builder.Services.AddScoped<IGeneralJournalRepository, GeneralJournalRepository>();
 
 
 var app = builder.Build();
