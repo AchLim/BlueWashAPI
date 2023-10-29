@@ -23,6 +23,10 @@ namespace WebAPI.Models
         [EmailAddress]
         public string EmailAddress { get; set; } = default!;
 
+        [RegularExpression(@"^\+?[0-9]*$", ErrorMessage = "Nomor Handphone tidak valid.")]
+        [StringLength(30)]
+        public string? MobileNumber { get; set; }
+
         [Required]
         public string PasswordHash { get; set; } = default!;
 
