@@ -26,9 +26,6 @@ namespace WebAPI.Models
         // FK - Purchase Detail
         public ICollection<PurchaseDetail>? PurchaseDetails { get; set; }
 
-        // FK - Sales Detail
-        public ICollection<SalesDetail>? SalesDetails { get; set; }
-
         // Auditable
         public DateTime? Created { get; set; }
         public string? CreatedBy { get; set; }

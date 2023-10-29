@@ -1,11 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.InteropServices;
 using System.Security.Claims;
-using System.Security.Principal;
 using WebAPI.DAL;
 using WebAPI.Models;
 using WebAPI.Models.Common;
@@ -27,6 +22,20 @@ namespace WebAPI.Data
         {
             modelBuilder.SeedCurrency();
             modelBuilder.SeedChartOfAccount();
+            modelBuilder.SeedLaundryServiceAndPriceMenu();
+
+            modelBuilder.Entity<PriceMenu>()
+                        .HasKey(pm => new { pm.LaundryServiceId, pm.PriceMenuId });
+
+            modelBuilder.Entity<SalesDetail>()
+                        .HasKey(sd => new { sd.SalesHeaderId, sd.SalesDetailId });
+
+            modelBuilder.Entity<SalesDetail>()
+                        .HasOne(sd => sd.PriceMenu)
+                        .WithMany(pm => pm.SalesDetails)
+                        .HasForeignKey(sd => new { sd.LaundryServiceId, sd.PriceMenuId })
+                        .IsRequired()
+                        .OnDelete(DeleteBehavior.ClientCascade);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -93,6 +102,8 @@ namespace WebAPI.Data
         public DbSet<SalesHeader> SalesHeaders { get; set; } = default!;
         public DbSet<SalesPayment> SalesPayments { get; set; } = default!;
         public DbSet<Supplier> Suppliers { get; set; } = default!;
+        public DbSet<LaundryService> LaundryServices { get; set; } = default!;
+        public DbSet<PriceMenu> PriceMenus { get; set; } = default!;
 
         #endregion
     }
