@@ -7,103 +7,103 @@ using WebAPI.Models.Mapper;
 
 namespace WebAPI.DAL
 {
-    public sealed class LaundryServiceRepository : ILaundryServiceRepository
+    public sealed class CustomerRepository : ICustomerRepository
     {
         private readonly ApplicationContext _context;
 
-        public LaundryServiceRepository(ApplicationContext context)
+        public CustomerRepository(ApplicationContext context)
         {
             _context = context;
         }
 
-        public async Task<IEnumerable<LaundryService>> GetAllLaundryServices()
+        public async Task<IEnumerable<Customer>> GetAllCustomers()
         {
-            IEnumerable<LaundryService> laundryServices = Enumerable.Empty<LaundryService>();
+            IEnumerable<Customer> customers = Enumerable.Empty<Customer>();
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    laundryServices = await _context.LaundryServices.ToListAsync();
+                    customers = await _context.Customers.ToListAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data Laundry Service", ex);
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data pelanggan", ex);
                 }
             }
 
-            return laundryServices;
+            return customers;
         }
 
-        public async Task<LaundryService?> GetLaundryServiceById(Guid id)
+        public async Task<Customer?> GetCustomerById(Guid id)
         {
-            LaundryService? laundryService = null;
+            Customer? customer = null;
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    laundryService = await _context.LaundryServices.Include(ls => ls.PriceMenus).FirstOrDefaultAsync(ls => ls.Id == id);
+                    customer = await _context.Customers.FindAsync(id);
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException($"Terjadi kesalahan dalam pengambilan data Laundry Service dengan id: {id}", ex);
+                    throw new DatabaseReadException($"Terjadi kesalahan dalam pengambilan data pelanggan dengan id: {id}", ex);
                 }
             }
 
-            return laundryService;
+            return customer;
         }
 
-        public async Task InsertLaundryService(LaundryService laundryService)
+        public async Task InsertCustomer(Customer customer)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    await _context.LaundryServices.AddAsync(laundryService);
+                    await _context.Customers.AddAsync(customer);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseInsertException($"Terjadi kesalahan dalam menambahkan data Laundry Service dengan nama: {laundryService.Name}", ex);
+                    throw new DatabaseInsertException($"Terjadi kesalahan dalam menambahkan data pelanggan dengan nama: {customer.CustomerName}", ex);
                 }
             }
         }
 
-        public async Task UpdateLaundryService(LaundryService laundryService)
+        public async Task UpdateCustomer(Customer customer)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    _context.LaundryServices.Update(laundryService);
+                    _context.Customers.Update(customer);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseUpdateException($"Terjadi kesalahan dalam memperbarui data Service Laundry dengan nama: {laundryService.Name}", ex);
+                    throw new DatabaseUpdateException($"Terjadi kesalahan dalam memperbarui data pelanggan dengan nama: {customer.CustomerName}", ex);
                 }
             }
         }
 
-        public async Task DeleteLaundryService(LaundryService laundryService)
+        public async Task DeleteCustomer(Customer customer)
         {
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    _context.LaundryServices.Remove(laundryService);
+                    _context.Customers.Remove(customer);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseDeleteException($"Terjadi kesalahan dalam menghapus data Service Laundry dengan id: {laundryService.Id}", ex);
+                    throw new DatabaseDeleteException($"Terjadi kesalahan dalam menghapus data pelanggan dengan id: {customer.Id}", ex);
                 }
             }
         }

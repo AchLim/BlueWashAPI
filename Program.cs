@@ -20,6 +20,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:5173");
         policy.WithHeaders(new[] { "Content-Type", "Authorization" });
+        policy.WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
     });
 });
 
@@ -70,6 +71,7 @@ builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
 
 builder.Services.AddScoped<ILaundryServiceRepository, LaundryServiceRepository>();
 builder.Services.AddScoped<IPriceMenuRepository, PriceMenuRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 builder.Services.AddScoped<ISalesRepository, SalesRepository>();
 builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();

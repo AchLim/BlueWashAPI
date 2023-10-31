@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DAL;
+using WebAPI.DTO;
 using WebAPI.Models;
 using WebAPI.Models.DTO;
 using WebAPI.Models.Mapper;
@@ -9,7 +10,7 @@ using WebAPI.Utility;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    //[Authorize(Roles = "ADMIN,MANAGER,STAFF")]
+    [Authorize(Roles = "ADMIN,MANAGER,STAFF")]
     [Route("[controller]")]
     public class LaundryServiceController : ControllerBase
     {
@@ -46,21 +47,21 @@ namespace WebAPI.Controllers
         //    return CreatedAtAction(nameof(GetCurrencyById), new { id = currency.Id }, currency);
         //}
 
-        //[HttpPut("update/{id}")]
-        //public async Task<ActionResult<Currency>> UpdateCurrency(Guid id, [FromBody] CurrencyUpdateDto currencyDto)
-        //{
-        //    if (id != currencyDto.Id)
-        //        return BadRequest("ID Mata Uang tidak cocok!");
+        [HttpPut("update/{id}")]
+        public async Task<ActionResult<LaundryService>> UpdateLaundryService(Guid id, [FromBody] LaundryServiceUpdateDto laundryServiceUpdateDto)
+        {
+            if (id != laundryServiceUpdateDto.Id)
+                return BadRequest("ID Tipe Laundry tidak cocok!");
 
-        //    Currency? currency = await _currencyRepository.GetCurrencyById(id);
-        //    if (currency is null)
-        //        return BadRequest($"Mata Uang dengan id: {id} tidak ditemukan");
+            LaundryService? laundryService = await _laundryServiceRepository.GetLaundryServiceById(id);
+            if (laundryService is null)
+                return BadRequest($"Tipe Laundry dengan id: {id} tidak ditemukan");
 
-        //    currencyDto.PassData(ref currency);
-        //    await _currencyRepository.UpdateCurrency(currency);
+            laundryServiceUpdateDto.PassData(ref laundryService);
+            await _laundryServiceRepository.UpdateLaundryService(laundryService);
 
-        //    return CreatedAtAction(nameof(GetCurrencyById), new { id = currency.Id }, currency);
-        //}
+            return CreatedAtAction(nameof(GetLaundryServiceById), new { id = laundryService.Id }, laundryService);
+        }
 
         [HttpDelete("delete/{id}")]
         public async Task<ActionResult> DeleteLaundryService(Guid id)
