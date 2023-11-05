@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFramework.Exceptions.Common;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.Exception;
 using WebAPI.Models;
@@ -64,6 +66,14 @@ namespace WebAPI.DAL
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
+                catch (UniqueConstraintException ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseUniqueConstraintException($@"
+                        Terjadi kesalahan dalam memperbarui data pelanggan dengan nama: {customer.CustomerName}.
+                        Kode Kustomer '{customer.CustomerCode}' sudah digunakan. Pastikan anda menggunakan kode yang unik.
+                    ", ex);
+                }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
@@ -81,6 +91,14 @@ namespace WebAPI.DAL
                     _context.Customers.Update(customer);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
+                }
+                catch (UniqueConstraintException ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseUniqueConstraintException($@"
+                        Terjadi kesalahan dalam memperbarui data pelanggan dengan nama: {customer.CustomerName}.
+                        Kode Kustomer '{customer.CustomerCode}' sudah digunakan. Pastikan anda menggunakan kode yang unik.
+                    ", ex);
                 }
                 catch (System.Exception ex)
                 {
