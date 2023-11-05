@@ -42,7 +42,7 @@ namespace WebAPI.Authentication
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
             var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(_jwtOptions.Issuer, _jwtOptions.Audience, claims, null, DateTime.UtcNow.AddHours(1), signingCredentials);
+            var token = new JwtSecurityToken(_jwtOptions.Issuer, _jwtOptions.Audience, claims, null, DateTime.UtcNow.AddHours(12), signingCredentials);
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
