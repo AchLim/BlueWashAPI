@@ -30,6 +30,7 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<DatabaseInsertExceptionFilter>();
     options.Filters.Add<DatabaseUpdateExceptionFilter>();
     options.Filters.Add<DatabaseDeleteExceptionFilter>();
+    options.Filters.Add<DatabaseUniqueConstraintExceptionFilter>();
 
 }).AddNewtonsoftJson(options =>
 {
@@ -72,6 +73,7 @@ builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
 builder.Services.AddScoped<ILaundryServiceRepository, LaundryServiceRepository>();
 builder.Services.AddScoped<IPriceMenuRepository, PriceMenuRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 builder.Services.AddScoped<ISalesRepository, SalesRepository>();
 builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
