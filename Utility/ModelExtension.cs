@@ -37,6 +37,13 @@ namespace WebAPI.Utility
             customer.CustomerAddress = dto.CustomerAddress;
             customer.CurrencyId = dto.CurrencyId;
         }
+        public static void PassData(this SupplierUpdateDto dto, ref Supplier supplier)
+        {
+            supplier.SupplierName = dto.SupplierName;
+            supplier.SupplierCode = dto.SupplierCode;
+            supplier.SupplierAddress = dto.SupplierAddress;
+            supplier.CurrencyId = dto.CurrencyId;
+        }
 
 
         public static bool IsNotEmpty<T>(this ICollection<T>? collections)
