@@ -58,6 +58,12 @@ namespace WebAPI.DAL
 
         public async Task InsertCustomer(Customer customer)
         {
+            if (customer.CustomerName.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nama Pelanggan tidak boleh kosong!", null);
+
+            if (customer.CustomerCode.Trim() == string.Empty)
+                throw new DatabaseInsertException("Kode Pelanggan tidak boleh kosong!", null);
+
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
@@ -84,6 +90,12 @@ namespace WebAPI.DAL
 
         public async Task UpdateCustomer(Customer customer)
         {
+            if (customer.CustomerName.Trim() == string.Empty)
+                throw new DatabaseUpdateException("Nama Pelanggan tidak boleh kosong!", null);
+
+            if (customer.CustomerCode.Trim() == string.Empty)
+                throw new DatabaseUpdateException("Kode Pelanggan tidak boleh kosong!", null);
+
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
