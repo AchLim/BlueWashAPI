@@ -18,7 +18,7 @@ namespace WebAPI.Exception
                 {
                     Content = payload,
                     ContentType = "application/json",
-                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    StatusCode = (int)HttpStatusCode.OK,
                 };
                 context.ExceptionHandled = true;
             }
