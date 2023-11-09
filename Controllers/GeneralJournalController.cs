@@ -10,7 +10,7 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Authorize(Roles = "ADMIN,MANAGER,STAFF")]
-    [Route("[controller]")]
+    [Route("general_journal")]
     public sealed class GeneralJournalController : ControllerBase
     {
         private readonly ILogger<GeneralJournalController> _logger;

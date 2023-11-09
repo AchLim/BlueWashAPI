@@ -11,7 +11,7 @@ namespace WebAPI.Controllers
 {
     [ApiController]
     [Authorize(Roles = "ADMIN,MANAGER,STAFF")]
-    [Route("[controller]")]
+    [Route("laundry_service")]
     public class LaundryServiceController : ControllerBase
     {
         private readonly ILogger<LaundryServiceController> _logger;

@@ -9,8 +9,8 @@ using WebAPI.Utility;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    //[Authorize(Roles = "ADMIN,MANAGER,STAFF")]
-    [Route("[controller]")]
+    [Authorize(Roles = "ADMIN,MANAGER,STAFF")]
+    [Route("price_menu")]
     public class PriceMenuController : ControllerBase
     {
         private readonly ILogger<PriceMenuController> _logger;
