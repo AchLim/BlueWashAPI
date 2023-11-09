@@ -30,6 +30,11 @@ namespace WebAPI.Models
         [Required]
         public string PasswordHash { get; set; } = default!;
 
+        public string RefreshToken { get; set; } = string.Empty;
+        public DateTime TokenCreation { get; set; }
+        public DateTime TokenExpiration { get; set; }
+
+
         public virtual ICollection<ApplicationUserRole>? UserRoles { get; set; }
     }
 }

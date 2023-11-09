@@ -7,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using WebAPI.Authentication;
 using WebAPI.DAL;
@@ -52,6 +54,14 @@ namespace WebAPI.Controllers
 
                     if (user is not null)
                     {
+                        RefreshToken refreshToken = GenerateRefreshToken();
+                        user.RefreshToken = refreshToken.Token;
+                        user.TokenCreation = refreshToken.Created;
+                        user.TokenExpiration = refreshToken.Expires;
+
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
                         _context.Entry(user)
                                 .Collection(u => u.UserRoles)
                                 .Query()
@@ -76,7 +86,85 @@ namespace WebAPI.Controllers
 
             string token = _jwtProvider.Generate(user);
 
-            return Ok(token);
+            return Ok(new
+            {
+                accessToken = token,
+                refreshToken = user.RefreshToken
+            });
+        }
+
+        [HttpPost("refresh-token")]
+        [AllowAnonymous]
+        public async Task<ActionResult<string>> RefreshToken([FromBody] RefreshBody refreshBody)
+        {
+            if (refreshBody.RefreshToken.Trim() == string.Empty)
+            {
+                return Forbid();
+            }
+
+            ApplicationUser? user = null;
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    user = await _context.Users.Where(user => user.RefreshToken.Equals(refreshBody.RefreshToken)).FirstOrDefaultAsync();
+
+
+                    if (user is not null)
+                    {
+                        if (user.TokenExpiration < DateTime.Now)
+                        {
+                            return Unauthorized("Token Expired.");
+                        }
+
+                        RefreshToken newRefreshToken = GenerateRefreshToken();
+                        user.RefreshToken = newRefreshToken.Token;
+                        user.TokenCreation = newRefreshToken.Created;
+                        user.TokenExpiration = newRefreshToken.Expires;
+
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        _context.Entry(user)
+                                .Collection(u => u.UserRoles)
+                                .Query()
+                                .Include(ur => ur.ApplicationRole)
+                                .Load();
+                    }
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    return BadRequest("Terjadi kesalahan pada database.");
+                }
+            }
+
+            if (user is null)
+            {
+                return BadRequest("Invalid request.");
+            }
+
+
+            string token = _jwtProvider.Generate(user);
+
+
+            return Ok(new
+            {
+                user = user.Login,
+                accessToken = token,
+                refreshToken = user.RefreshToken
+            });
+        }
+
+        private static RefreshToken GenerateRefreshToken()
+        {
+            RefreshToken token = new()
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Expires = DateTime.Now.AddDays(7)
+            };
+
+            return token;
         }
     }
 
@@ -85,4 +173,9 @@ namespace WebAPI.Controllers
         public required string Login { get; set; }
         public required string Password { get; set; }
 }
+
+    public class RefreshBody
+    {
+        public string RefreshToken { get; set; } = string.Empty;
+    }
 }
