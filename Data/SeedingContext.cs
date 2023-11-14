@@ -75,6 +75,20 @@ namespace Book_Lending_System.Data
 
                         await context.UserRoles.AddRangeAsync(userRoles);
                         await context.SaveChangesAsync();
+
+                        List<Menu> menus = await context.Menus.AsNoTracking().ToListAsync();
+                        List<UserMenu> userMenus = new(menus.Count);
+                        foreach (var menu in menus)
+                        {
+                            userMenus.Add(new UserMenu
+                            {
+                                ApplicationUserId = adminUser.Id,
+                                MenuId = menu.Id,
+                            });
+                        }
+
+                        await context.UserMenus.AddRangeAsync(userMenus);
+                        await context.SaveChangesAsync();
                     }
 
                     // Manager

@@ -44,7 +44,7 @@ namespace WebAPI.Utility
         }
         public static void SeedChartOfAccount(this ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ChartOfAccount>().HasData(new List<ChartOfAccount>(15)
+            modelBuilder.Entity<ChartOfAccount>().HasData(new List<ChartOfAccount>(18)
             {
                 new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 100, AccountHeaderName = "Asset", AccountNo = 111, AccountName = "Kas" },
                 new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 100, AccountHeaderName = "Asset", AccountNo = 112, AccountName = "Bank" },
@@ -56,16 +56,17 @@ namespace WebAPI.Utility
                 new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 200, AccountHeaderName = "Liabilitas", AccountNo = 201, AccountName = "Utang Usaha" },
                 new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 300, AccountHeaderName = "Ekuitas", AccountNo = 301, AccountName = "Ekuitas Pemilik Usaha" },
                 new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 400, AccountHeaderName = "Pendapatan", AccountNo = 401, AccountName = "Pendapatan Penjualan" },
-                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 500, AccountHeaderName = "Pengeluaran", AccountNo = 501, AccountName = "Beban Gaji" },
-                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 500, AccountHeaderName = "Pengeluaran", AccountNo = 502, AccountName = "Beban Sewa" },
-                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 500, AccountHeaderName = "Pengeluaran", AccountNo = 503, AccountName = "Beban Utilitas" },
-                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 500, AccountHeaderName = "Pengeluaran", AccountNo = 504, AccountName = "Beban Listrik" },
-                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 500, AccountHeaderName = "Pengeluaran", AccountNo = 505, AccountName = "Beban Perlengkapan" },
-                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 500, AccountHeaderName = "Pengeluaran", AccountNo = 506, AccountName = "Beban Depresiasi" },
+                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 500, AccountHeaderName = "Harga Pokok Penjualan", AccountNo = 501, AccountName = "Pembelian" },
+                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 500, AccountHeaderName = "Harga Pokok Penjualan", AccountNo = 511, AccountName = "Persediaan Awal" },
+                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 500, AccountHeaderName = "Harga Pokok Penjualan", AccountNo = 521, AccountName = "Persediaan Akhir" },
+                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 600, AccountHeaderName = "Pengeluaran", AccountNo = 601, AccountName = "Beban Gaji" },
+                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 600, AccountHeaderName = "Pengeluaran", AccountNo = 602, AccountName = "Beban Sewa" },
+                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 600, AccountHeaderName = "Pengeluaran", AccountNo = 603, AccountName = "Beban Utilitas" },
+                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 600, AccountHeaderName = "Pengeluaran", AccountNo = 604, AccountName = "Beban Listrik" },
+                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 600, AccountHeaderName = "Pengeluaran", AccountNo = 605, AccountName = "Beban Perlengkapan" },
+                new ChartOfAccount { Id = Guid.NewGuid(), AccountHeaderNo = 600, AccountHeaderName = "Pengeluaran", AccountNo = 606, AccountName = "Beban Depresiasi" },
             });
         }
-
-
         public static void SeedLaundryServiceAndPriceMenu(this ModelBuilder modelBuilder)
         {
             var paket_bulanan_lengkap_guid = Guid.NewGuid();
@@ -164,6 +165,48 @@ namespace WebAPI.Utility
                 new PriceMenu { LaundryServiceId = sprei_dan_alas_kasur_guid, PriceMenuId = Guid.NewGuid(), Name = "Alas Kasur King", Price = 25_000, PricingOption = PricingOption.Unit, TimeUnit = TimeUnit.Day, ProcessingTime = 3, DeliveryOption = DeliveryOption.Reguler },
                 new PriceMenu { LaundryServiceId = sprei_dan_alas_kasur_guid, PriceMenuId = Guid.NewGuid(), Name = "Alas Kasur Queen", Price = 20_000, PricingOption = PricingOption.Unit, TimeUnit = TimeUnit.Day, ProcessingTime = 3, DeliveryOption = DeliveryOption.Reguler },
                 new PriceMenu { LaundryServiceId = sprei_dan_alas_kasur_guid, PriceMenuId = Guid.NewGuid(), Name = "Alas Kasur Single", Price = 15_000, PricingOption = PricingOption.Unit, TimeUnit = TimeUnit.Day, ProcessingTime = 3, DeliveryOption = DeliveryOption.Reguler },
+            });
+        }
+        public static void SeedMenu(this ModelBuilder modelBuilder)
+        {
+            var dashboardCategoryGuid = Guid.NewGuid();
+            var transactionCategoryGuid = Guid.NewGuid();
+            var masterDataCategoryGuid = Guid.NewGuid();
+            var generalJournalCategoryGuid = Guid.NewGuid();
+            var purchaseCategoryGuid = Guid.NewGuid();
+            var salesCategoryGuid = Guid.NewGuid();
+
+            modelBuilder.Entity<MenuCategory>().HasData(new List<MenuCategory>(6)
+            {
+                new MenuCategory { Id = dashboardCategoryGuid, CategorySequence = 10, CategoryName = "dashboard", CategoryDisplayName = "Dashboard" },
+                new MenuCategory { Id = transactionCategoryGuid, CategorySequence = 20, CategoryName = "transaction", CategoryDisplayName = "Transaction" },
+                new MenuCategory { Id = masterDataCategoryGuid, CategorySequence = 30, CategoryName = "master-data", CategoryDisplayName = "Master Data" },
+                new MenuCategory { Id = generalJournalCategoryGuid, CategorySequence = 40, CategoryName = "general-journal", CategoryDisplayName = "General Journal" },
+                new MenuCategory { Id = purchaseCategoryGuid, CategorySequence = 50, CategoryName = "purchase", CategoryDisplayName = "Purchase" },
+                new MenuCategory { Id = salesCategoryGuid, CategorySequence = 60, CategoryName = "sales", CategoryDisplayName = "Sales" },
+            });
+
+            modelBuilder.Entity<Menu>().HasData(new List<Menu>(13)
+            {
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = dashboardCategoryGuid, MenuSequence = 10, MenuName = "dashboard", MenuDisplayName = "Dashboard" },
+
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = transactionCategoryGuid, MenuSequence = 10, MenuName = "transaction", MenuDisplayName = "Tambah Transaksi" },
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = transactionCategoryGuid, MenuSequence = 20, MenuName = "expense", MenuDisplayName = "Tambah Pengeluaran" },
+
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = masterDataCategoryGuid, MenuSequence = 10, MenuName = "chart-of-account", MenuDisplayName = "Chart of Account" },
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = masterDataCategoryGuid, MenuSequence = 20, MenuName = "customer", MenuDisplayName = "Pelanggan" },
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = masterDataCategoryGuid, MenuSequence = 30, MenuName = "supplier", MenuDisplayName = "Pemasok" },
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = masterDataCategoryGuid, MenuSequence = 40, MenuName = "inventory", MenuDisplayName = "Persediaan" },
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = masterDataCategoryGuid, MenuSequence = 50, MenuName = "laundry-service", MenuDisplayName = "Tipe Laundry" },
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = masterDataCategoryGuid, MenuSequence = 60, MenuName = "price-menu", MenuDisplayName = "Menu Harga" },
+
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = generalJournalCategoryGuid, MenuSequence = 10, MenuName = "general-journal", MenuDisplayName = "Jurnal Umum" },
+
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = purchaseCategoryGuid, MenuSequence = 10, MenuName = "purchase", MenuDisplayName = "Pembelian" },
+
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = salesCategoryGuid, MenuSequence = 10, MenuName = "sales", MenuDisplayName = "Penjualan" },
+                new Menu { Id = Guid.NewGuid(), MenuCategoryId = salesCategoryGuid, MenuSequence = 20, MenuName = "sales-payment", MenuDisplayName = "Pembayaran Penjualan" },
+
             });
         }
 

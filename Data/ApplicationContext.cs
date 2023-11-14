@@ -30,6 +30,7 @@ namespace WebAPI.Data
             modelBuilder.SeedCurrency();
             modelBuilder.SeedChartOfAccount();
             modelBuilder.SeedLaundryServiceAndPriceMenu();
+            modelBuilder.SeedMenu();
 
             modelBuilder.Entity<PriceMenu>()
                         .HasKey(pm => new { pm.LaundryServiceId, pm.PriceMenuId });
@@ -97,11 +98,14 @@ namespace WebAPI.Data
         public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<ApplicationRole> Roles { get; set; }
         public DbSet<ApplicationUserRole> UserRoles { get; set; }
+        public DbSet<MenuCategory> MenuCategories { get; set; }
+        public DbSet<Menu> Menus { get; set; }
+        public DbSet<UserMenu> UserMenus { get; set; }
         public DbSet<ChartOfAccount> ChartOfAccounts { get; set; } = default!;
         public DbSet<Currency> Currencies { get; set; } = default!;
         public DbSet<Customer> Customers { get; set; } = default!;
-        public DbSet<GeneralAccountDetail> GeneralAccountDetails { get; set; } = default!;
-        public DbSet<GeneralAccountHeader> GeneralAccountHeaders { get; set; } = default!;
+        public DbSet<GeneralJournalDetail> GeneralJournalDetails { get; set; } = default!;
+        public DbSet<GeneralJournalHeader> GeneralJournalHeaders { get; set; } = default!;
         public DbSet<Inventory> Inventories { get; set; } = default!;
         public DbSet<PurchaseDetail> PurchaseDetails { get; set; } = default!;
         public DbSet<PurchaseHeader> PurchaseHeaders { get; set; } = default!;
