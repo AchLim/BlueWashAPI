@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFramework.Exceptions.Common;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.Exception;
+using WebAPI.Models;
 
 namespace WebAPI.DAL
 {
@@ -11,6 +14,126 @@ namespace WebAPI.DAL
         public GeneralJournalRepository(ApplicationContext context)
         {
             _context = context;
+        }
+
+
+        public async Task<IEnumerable<GeneralJournalHeader>> GetAllGeneralJournalHeaders()
+        {
+            IEnumerable<GeneralJournalHeader> generalJournalHeaders = Enumerable.Empty<GeneralJournalHeader>();
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    generalJournalHeaders = await _context.GeneralJournalHeaders
+                                                            .Include(header => header.GeneralJournalDetails!)
+                                                            .ThenInclude(detail => detail.ChartOfAccount)
+                                                            .ToListAsync();
+                }
+                catch (System.Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data header jurnal umum.", ex);
+                }
+            }
+
+            return generalJournalHeaders;
+        }
+
+        public async Task<GeneralJournalHeader?> GetGeneralJournalHeaderById(Guid id)
+        {
+            GeneralJournalHeader? generalJournalHeader = null;
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    generalJournalHeader = await _context.GeneralJournalHeaders
+                                                            .Include(header => header.GeneralJournalDetails!)
+                                                            .ThenInclude(detail => detail.ChartOfAccount)
+                                                            .FirstOrDefaultAsync(header => header.Id == id);
+                }
+                catch (System.Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseReadException($"Terjadi kesalahan dalam pengambilan data header jurnal umum dengan id: {id}", ex);
+                }
+            }
+
+            return generalJournalHeader;
+        }
+
+        public async Task InsertGeneralJournalHeader(GeneralJournalHeader generalJournalHeader)
+        {
+            if (generalJournalHeader.TransactionNo.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nomor Transaksi tidak boleh kosong!", null);
+
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    await _context.GeneralJournalHeaders.AddAsync(generalJournalHeader);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (UniqueConstraintException ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseUniqueConstraintException($@"
+                        Terjadi kesalahan dalam memperbarui data header jurnal umum dengan nomor transaksi: {generalJournalHeader.TransactionNo}.
+                        Nomor transaksi '{generalJournalHeader.TransactionNo}' sudah digunakan. Pastikan anda menggunakan nomor transaksi yang unik.
+                    ", ex);
+                }
+                catch (System.Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseInsertException($"Terjadi kesalahan dalam menambahkan header jurnal umum dengan nomor transaksi: {generalJournalHeader.TransactionNo}", ex);
+                }
+            }
+        }
+        public async Task UpdateGeneralJournalHeader(GeneralJournalHeader generalJournalHeader)
+        {
+            if (generalJournalHeader.TransactionNo.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nomor Transaksi tidak boleh kosong!", null);
+
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    _context.GeneralJournalHeaders.Update(generalJournalHeader);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (UniqueConstraintException ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseUniqueConstraintException($@"
+                        Terjadi kesalahan dalam memperbarui data header jurnal umum dengan nomor transaksi: {generalJournalHeader.TransactionNo}.
+                        Nomor transaksi '{generalJournalHeader.TransactionNo}' sudah digunakan. Pastikan anda menggunakan nomor transaksi yang unik.
+                    ", ex);
+                }
+                catch (System.Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseUpdateException($"Terjadi kesalahan dalam memperbarui data header jurnal umum dengan nomor transaksi: {generalJournalHeader.TransactionNo}", ex);
+                }
+            }
+        }
+        public async Task DeleteGeneralJournalHeader(GeneralJournalHeader generalJournalHeader)
+        {
+
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    _context.GeneralJournalHeaders.Remove(generalJournalHeader);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (System.Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseDeleteException($"Terjadi kesalahan dalam menghapus data header jurnal umum dengan nomor transaksi: {generalJournalHeader.TransactionNo}", ex);
+                }
+            }
         }
 
         public async Task<IEnumerable<GeneralJournalContainer>> GetGeneralJournalData()
@@ -40,18 +163,18 @@ namespace WebAPI.DAL
 
         public IQueryable<GeneralJournalContainer> GetGeneralJournalQuery()
         {
-            return _context.GeneralAccountHeaders.GroupJoin(_context.GeneralAccountDetails.Join(_context.ChartOfAccounts,
+            return _context.GeneralJournalHeaders.GroupJoin(_context.GeneralJournalDetails.Join(_context.ChartOfAccounts,
                                                                                                                    detail => detail.ChartOfAccountId,
                                                                                                                    coa => coa.Id,
                                                                                                                    (detail, coa) => new
                                                                                                                    {
-                                                                                                                       GeneralAccountHeaderId = detail.GeneralAccountHeaderId,
+                                                                                                                       GeneralJournalHeaderId = detail.GeneralJournalHeaderId,
                                                                                                                        AccountNo = coa.AccountNo,
                                                                                                                        Debit = detail.Debit,
                                                                                                                        Credit = detail.Credit,
                                                                                                                    }),
                                                                               header => header.Id,
-                                                                              detail => detail.GeneralAccountHeaderId,
+                                                                              detail => detail.GeneralJournalHeaderId,
                                                                               (header, details) => new
                                                                               {
                                                                                   TransactionNo = header.TransactionNo,
@@ -105,7 +228,7 @@ namespace WebAPI.DAL
                                                                                     TransactionNo = header.TransactionNo,
                                                                                     TransactionDate = header.TransactionDate,
                                                                                     Description = header.Description,
-                                                                                    AccountNo = detail != null ? (int?)113 : null,
+                                                                                    AccountNo = detail != null ? (int?)501 : null,
                                                                                     Debit = detail != null ? (decimal?)(detail.Price * detail.Quantity) : null,
                                                                                     Credit = detail != null ? (decimal?)0m : null,
                                                                                 })
