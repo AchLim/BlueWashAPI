@@ -45,6 +45,33 @@ namespace WebAPI.Utility
             supplier.CurrencyId = dto.CurrencyId;
         }
 
+        public static void PassData(this ChartOfAccountUpdateDto dto, ref ChartOfAccount chartOfAccount)
+        {
+            chartOfAccount.AccountHeaderNo = dto.AccountHeaderNo;
+            chartOfAccount.AccountHeaderName = dto.AccountHeaderName;
+            chartOfAccount.AccountNo = dto.AccountNo;
+            chartOfAccount.AccountName = dto.AccountName;
+        }
+
+        public static void PassData(this GeneralJournalHeaderUpdateDto dto, ref GeneralJournalHeader generalJournalHeader)
+        {
+            generalJournalHeader.TransactionNo = dto.TransactionNo;
+            generalJournalHeader.TransactionDate = DateOnly.FromDateTime(dto.TransactionDate);
+            generalJournalHeader.Description = dto.Description;
+
+            List<GeneralJournalDetail> details = new();
+
+            if (dto.GeneralJournalDetails.IsNotEmpty())
+            {
+                foreach (var detail in dto.GeneralJournalDetails!)
+                {
+                    details.Add(new GeneralJournalDetail { ChartOfAccountId = detail.ChartOfAccountId, Debit = detail.Debit, Credit = detail.Credit });
+                }
+            }
+
+            generalJournalHeader.GeneralJournalDetails = details;
+        }
+
 
         public static bool IsNotEmpty<T>(this ICollection<T>? collections)
         {
