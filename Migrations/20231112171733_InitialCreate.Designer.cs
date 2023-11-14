@@ -12,7 +12,7 @@ using WebAPI.Data;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20231029120150_InitialCreate")]
+    [Migration("20231112171733_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -66,6 +66,16 @@ namespace WebAPI.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("TokenCreation")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TokenExpiration")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -144,7 +154,7 @@ namespace WebAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("4641765c-ee78-4a2f-82e7-4574eb1dab0d"),
+                            Id = new Guid("20e9e0be-7446-41a0-9893-584d45b80175"),
                             AccountHeaderName = "Asset",
                             AccountHeaderNo = 100,
                             AccountName = "Kas",
@@ -152,7 +162,7 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            Id = new Guid("2d4d1231-267f-4f8d-9967-0c06718eac09"),
+                            Id = new Guid("5745b241-3359-455f-9eec-f05fa4100458"),
                             AccountHeaderName = "Asset",
                             AccountHeaderNo = 100,
                             AccountName = "Bank",
@@ -160,7 +170,7 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            Id = new Guid("3c257b8b-10b0-46c6-b63f-71296619cb65"),
+                            Id = new Guid("c5bb4cb1-58f9-44ea-99ad-832bc3d8aea1"),
                             AccountHeaderName = "Asset",
                             AccountHeaderNo = 100,
                             AccountName = "Persediaan",
@@ -168,7 +178,7 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            Id = new Guid("6384d92c-cd73-4219-86b0-a653f5b72adc"),
+                            Id = new Guid("9472ca38-f325-4e7e-8df2-a8335647fb16"),
                             AccountHeaderName = "Asset",
                             AccountHeaderNo = 100,
                             AccountName = "Perlengkapan",
@@ -176,7 +186,7 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            Id = new Guid("5b6e2813-bbbc-497e-a19a-d914377514b2"),
+                            Id = new Guid("126bba2e-af19-4b10-8987-9cb6ef6ddbcc"),
                             AccountHeaderName = "Asset",
                             AccountHeaderNo = 100,
                             AccountName = "Sewa dibayar di muka",
@@ -184,7 +194,7 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            Id = new Guid("d63d4f83-52fd-40bb-bd0b-b0f60248b282"),
+                            Id = new Guid("76b37fdd-f6b2-4744-8ee1-9325ee315013"),
                             AccountHeaderName = "Asset",
                             AccountHeaderNo = 100,
                             AccountName = "Peralatan",
@@ -192,7 +202,7 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            Id = new Guid("d9fb8c52-1982-4aa3-96aa-3d9f98d220d4"),
+                            Id = new Guid("f4e5f9c5-87ba-43c3-ab16-14fa6e6a3c7f"),
                             AccountHeaderName = "Asset",
                             AccountHeaderNo = 100,
                             AccountName = "Akumulasi Depresiasi - Mesin Cuci",
@@ -200,7 +210,7 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            Id = new Guid("fa87aab7-a87f-4ee0-bc51-9b7df8247f33"),
+                            Id = new Guid("3808a200-1676-4e3b-8b0f-ece3b72daa61"),
                             AccountHeaderName = "Liabilitas",
                             AccountHeaderNo = 200,
                             AccountName = "Utang Usaha",
@@ -208,7 +218,7 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            Id = new Guid("b3433c9f-5092-42de-a819-d08c13e2c786"),
+                            Id = new Guid("d86a09a8-9275-4d49-8ebc-9247a0e1e294"),
                             AccountHeaderName = "Ekuitas",
                             AccountHeaderNo = 300,
                             AccountName = "Ekuitas Pemilik Usaha",
@@ -216,7 +226,7 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            Id = new Guid("e7decc39-8496-4f8e-98ae-12ccf533f61b"),
+                            Id = new Guid("9f275366-66bc-4a84-b6bb-4d97cc19a19f"),
                             AccountHeaderName = "Pendapatan",
                             AccountHeaderNo = 400,
                             AccountName = "Pendapatan Penjualan",
@@ -224,51 +234,75 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            Id = new Guid("d213010c-ce6c-4712-9699-fb504986d9e9"),
-                            AccountHeaderName = "Pengeluaran",
+                            Id = new Guid("91effaa7-34f4-4527-960e-100decafd25c"),
+                            AccountHeaderName = "Harga Pokok Penjualan",
                             AccountHeaderNo = 500,
-                            AccountName = "Beban Gaji",
+                            AccountName = "Pembelian",
                             AccountNo = 501
                         },
                         new
                         {
-                            Id = new Guid("ec6d2e6b-009b-4824-aa5a-1f014455b6d6"),
-                            AccountHeaderName = "Pengeluaran",
+                            Id = new Guid("d1e17d8f-992f-4122-8dd7-de46a057d615"),
+                            AccountHeaderName = "Harga Pokok Penjualan",
                             AccountHeaderNo = 500,
+                            AccountName = "Persediaan Awal",
+                            AccountNo = 511
+                        },
+                        new
+                        {
+                            Id = new Guid("c8005361-1a02-4f01-a1c7-1302a2070a8b"),
+                            AccountHeaderName = "Harga Pokok Penjualan",
+                            AccountHeaderNo = 500,
+                            AccountName = "Persediaan Akhir",
+                            AccountNo = 521
+                        },
+                        new
+                        {
+                            Id = new Guid("e49061b6-4e61-4114-8118-c5e753a87fc6"),
+                            AccountHeaderName = "Pengeluaran",
+                            AccountHeaderNo = 600,
+                            AccountName = "Beban Gaji",
+                            AccountNo = 601
+                        },
+                        new
+                        {
+                            Id = new Guid("9c7b506c-04fb-45e9-af53-d53c44f9f6b1"),
+                            AccountHeaderName = "Pengeluaran",
+                            AccountHeaderNo = 600,
                             AccountName = "Beban Sewa",
-                            AccountNo = 502
+                            AccountNo = 602
                         },
                         new
                         {
-                            Id = new Guid("57060c37-e3f1-4871-b565-df83f354edaa"),
+                            Id = new Guid("7f9d2f5b-b3ca-4ab6-828b-ee0bdb3afc13"),
                             AccountHeaderName = "Pengeluaran",
-                            AccountHeaderNo = 500,
+                            AccountHeaderNo = 600,
                             AccountName = "Beban Utilitas",
-                            AccountNo = 503
+                            AccountNo = 603
                         },
                         new
                         {
-                            Id = new Guid("531c171b-4b4a-4ca3-8a3b-db705903b051"),
+                            Id = new Guid("d9328084-7759-44a4-ab91-2a0f1d53818b"),
                             AccountHeaderName = "Pengeluaran",
-                            AccountHeaderNo = 500,
+                            AccountHeaderNo = 600,
                             AccountName = "Beban Listrik",
-                            AccountNo = 504
+                            AccountNo = 604
                         },
                         new
                         {
-                            Id = new Guid("5c168ca1-33bb-43ef-aeb3-6c8989d9fd2b"),
+                            Id = new Guid("8e716434-a6a7-4ab7-81c7-c673a8e405c4"),
                             AccountHeaderName = "Pengeluaran",
-                            AccountHeaderNo = 500,
+                            AccountHeaderNo = 600,
                             AccountName = "Beban Perlengkapan",
-                            AccountNo = 505
+                            AccountNo = 605
                         },
                         new
                         {
-                            Id = new Guid("01315a51-bbc7-4e22-bfb0-abce26d2607c"),
+                            Id = new Guid("7e258f97-8875-4ee7-a121-c8a7b604930e"),
                             AccountHeaderName = "Pengeluaran",
-                            AccountHeaderNo = 500,
+                            AccountHeaderNo = 600,
                             AccountName = "Beban Depresiasi",
-                            AccountNo = 506
+                            AccountNo = 606
                         });
                 });
 
@@ -315,28 +349,28 @@ namespace WebAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b97e9501-e2c9-4273-8fea-f437d21ef75c"),
+                            Id = new Guid("c0bc3aee-031e-4c4e-bd51-5bb1fc0f2129"),
                             Code = "IDR",
                             CultureName = "id-ID",
                             Name = "Indonesia Rupiah"
                         },
                         new
                         {
-                            Id = new Guid("2b1b149c-93b5-485d-bc6e-26167e0ac899"),
+                            Id = new Guid("c83607a0-aa7f-40b6-a5be-bb7e11cbabe6"),
                             Code = "SGD",
                             CultureName = "en-SG",
                             Name = "Dollar Singapore"
                         },
                         new
                         {
-                            Id = new Guid("1b97d48f-1ce4-4d08-93e0-96dc1fdd1c9f"),
+                            Id = new Guid("5986c9b3-b392-46b0-82b6-0fe6f0544383"),
                             Code = "MYR",
                             CultureName = "ms-MY",
                             Name = "Ringgit Malaysia"
                         },
                         new
                         {
-                            Id = new Guid("4438c3b5-093f-4a58-a112-b91004431915"),
+                            Id = new Guid("4e5f5870-e543-4d6b-82ae-c582f9dd746d"),
                             Code = "USD",
                             CultureName = "en-US",
                             Name = "Dollar USD"
@@ -388,13 +422,13 @@ namespace WebAPI.Migrations
                     b.ToTable("customer");
                 });
 
-            modelBuilder.Entity("WebAPI.Models.GeneralAccountDetail", b =>
+            modelBuilder.Entity("WebAPI.Models.GeneralJournalDetail", b =>
                 {
-                    b.Property<Guid>("GeneralAccountHeaderId")
+                    b.Property<Guid>("GeneralJournalHeaderId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnOrder(0);
 
-                    b.Property<Guid>("GeneralAccountDetailId")
+                    b.Property<Guid>("GeneralJournalDetailId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasColumnOrder(1);
@@ -422,14 +456,14 @@ namespace WebAPI.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("GeneralAccountHeaderId", "GeneralAccountDetailId");
+                    b.HasKey("GeneralJournalHeaderId", "GeneralJournalDetailId");
 
                     b.HasIndex("ChartOfAccountId");
 
-                    b.ToTable("general_account_detail");
+                    b.ToTable("general_journal_detail");
                 });
 
-            modelBuilder.Entity("WebAPI.Models.GeneralAccountHeader", b =>
+            modelBuilder.Entity("WebAPI.Models.GeneralJournalHeader", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -463,7 +497,7 @@ namespace WebAPI.Migrations
                     b.HasIndex("TransactionNo")
                         .IsUnique();
 
-                    b.ToTable("general_account_header");
+                    b.ToTable("general_journal_header");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Inventory", b =>
@@ -537,63 +571,266 @@ namespace WebAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("24f4688c-0696-4cbc-b9bf-beebf045cd01"),
+                            Id = new Guid("b8274b3f-b266-4f73-ab55-1697442c2334"),
                             LaundryProcess = 7,
                             Name = "PAKET BULANAN LENGKAP"
                         },
                         new
                         {
-                            Id = new Guid("17316939-27da-4072-9e9f-151f1dcbbf1e"),
+                            Id = new Guid("1bc86c21-a291-464a-9f1b-cf1242593d62"),
                             LaundryProcess = 4,
                             Name = "PAKET BULANAN SETRIKA"
                         },
                         new
                         {
-                            Id = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
+                            Id = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
                             LaundryProcess = 3,
                             Name = "SATUAN"
                         },
                         new
                         {
-                            Id = new Guid("79557007-dc13-4a39-831d-d9bf0b17cd38"),
+                            Id = new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"),
                             LaundryProcess = 3,
                             Name = "SEPATU DAN TAS"
                         },
                         new
                         {
-                            Id = new Guid("c6b1f038-dcda-41bf-9ecb-ce213ea84ab6"),
+                            Id = new Guid("253194b4-064a-45db-ba44-9105a26e1065"),
                             LaundryProcess = 3,
                             Name = "KARPET/GORDEN"
                         },
                         new
                         {
-                            Id = new Guid("8cd87758-7af4-4b0d-a3d1-798fc26d65b8"),
+                            Id = new Guid("9dcfba5f-8deb-48fb-8e7a-1e89972576f1"),
                             LaundryProcess = 7,
                             Name = "KILOAN LENGKAP"
                         },
                         new
                         {
-                            Id = new Guid("81fca663-9d6f-4d57-88bf-60572d75bd27"),
+                            Id = new Guid("79d6307f-0a2d-434b-9369-14ca2a7b0964"),
                             LaundryProcess = 7,
                             Name = "KILOAN SETRIKA/CUCI LIPAT"
                         },
                         new
                         {
-                            Id = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
+                            Id = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
                             LaundryProcess = 3,
                             Name = "BED COVER & SELIMUT"
                         },
                         new
                         {
-                            Id = new Guid("26f330d9-b716-4947-b318-430719eb06b8"),
+                            Id = new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"),
                             LaundryProcess = 3,
                             Name = "SPREI & ALAS KASUR"
                         },
                         new
                         {
-                            Id = new Guid("43896f0e-231d-4765-8700-24c8422033e0"),
+                            Id = new Guid("1278cc21-6dd5-4524-be6e-70abf62fa72d"),
                             LaundryProcess = 3,
                             Name = "BANTAL/BONEKA"
+                        });
+                });
+
+            modelBuilder.Entity("WebAPI.Models.Menu", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MenuCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MenuDisplayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MenuName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("MenuSequence")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuCategoryId", "MenuName")
+                        .IsUnique();
+
+                    b.ToTable("menu");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("ee558897-5562-4092-8e67-1dece1677335"),
+                            MenuCategoryId = new Guid("7438f325-b9ba-45cb-b140-98ef709d1242"),
+                            MenuDisplayName = "Dashboard",
+                            MenuName = "dashboard",
+                            MenuSequence = 10
+                        },
+                        new
+                        {
+                            Id = new Guid("c210a099-6c14-4800-985b-606d9e28d436"),
+                            MenuCategoryId = new Guid("620f0bfd-5891-4d19-9add-0645599726a3"),
+                            MenuDisplayName = "Tambah Transaksi",
+                            MenuName = "transaction",
+                            MenuSequence = 10
+                        },
+                        new
+                        {
+                            Id = new Guid("798c3387-73d8-4d87-9166-6fee51467196"),
+                            MenuCategoryId = new Guid("620f0bfd-5891-4d19-9add-0645599726a3"),
+                            MenuDisplayName = "Tambah Pengeluaran",
+                            MenuName = "expense",
+                            MenuSequence = 20
+                        },
+                        new
+                        {
+                            Id = new Guid("80eee7db-4076-4945-8868-ff5adfa7ce3b"),
+                            MenuCategoryId = new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"),
+                            MenuDisplayName = "Chart of Account",
+                            MenuName = "chart-of-account",
+                            MenuSequence = 10
+                        },
+                        new
+                        {
+                            Id = new Guid("ac5cc0b3-6c6e-4b59-a8a9-14bd57f37818"),
+                            MenuCategoryId = new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"),
+                            MenuDisplayName = "Pelanggan",
+                            MenuName = "customer",
+                            MenuSequence = 20
+                        },
+                        new
+                        {
+                            Id = new Guid("6a18aaa5-0e3f-4bbb-8efe-1ca28dc358db"),
+                            MenuCategoryId = new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"),
+                            MenuDisplayName = "Pemasok",
+                            MenuName = "supplier",
+                            MenuSequence = 30
+                        },
+                        new
+                        {
+                            Id = new Guid("a4d2bbbb-b728-4ec4-98a1-0c9c13fc93ab"),
+                            MenuCategoryId = new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"),
+                            MenuDisplayName = "Persediaan",
+                            MenuName = "inventory",
+                            MenuSequence = 40
+                        },
+                        new
+                        {
+                            Id = new Guid("60121a4c-2615-471f-a7b1-f3323dbd5a1b"),
+                            MenuCategoryId = new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"),
+                            MenuDisplayName = "Tipe Laundry",
+                            MenuName = "laundry-service",
+                            MenuSequence = 50
+                        },
+                        new
+                        {
+                            Id = new Guid("2e6f34c4-8ab6-4b2b-a3dc-34fee9f5fca0"),
+                            MenuCategoryId = new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"),
+                            MenuDisplayName = "Menu Harga",
+                            MenuName = "price-menu",
+                            MenuSequence = 60
+                        },
+                        new
+                        {
+                            Id = new Guid("ca109359-d856-41ed-986c-36f03365b2c7"),
+                            MenuCategoryId = new Guid("2b125185-f2d4-40be-81de-adbbf8932d6d"),
+                            MenuDisplayName = "Jurnal Umum",
+                            MenuName = "general-journal",
+                            MenuSequence = 10
+                        },
+                        new
+                        {
+                            Id = new Guid("a9664959-e933-4ba0-8a2a-dda86703bfc7"),
+                            MenuCategoryId = new Guid("1be8a5b4-43e9-4f25-a737-3ba50ed86e2d"),
+                            MenuDisplayName = "Pembelian",
+                            MenuName = "purchase",
+                            MenuSequence = 10
+                        },
+                        new
+                        {
+                            Id = new Guid("b3fb0010-bff0-4e76-8916-32855e7500ab"),
+                            MenuCategoryId = new Guid("5f88078c-c20c-4b3c-800e-a976c1140b02"),
+                            MenuDisplayName = "Penjualan",
+                            MenuName = "sales",
+                            MenuSequence = 10
+                        },
+                        new
+                        {
+                            Id = new Guid("faac0c52-e69f-4ae3-a3b5-e0f4a437498b"),
+                            MenuCategoryId = new Guid("5f88078c-c20c-4b3c-800e-a976c1140b02"),
+                            MenuDisplayName = "Pembayaran Penjualan",
+                            MenuName = "sales-payment",
+                            MenuSequence = 20
+                        });
+                });
+
+            modelBuilder.Entity("WebAPI.Models.MenuCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CategoryDisplayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("CategorySequence")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryName")
+                        .IsUnique();
+
+                    b.ToTable("menu_category");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("7438f325-b9ba-45cb-b140-98ef709d1242"),
+                            CategoryDisplayName = "Dashboard",
+                            CategoryName = "dashboard",
+                            CategorySequence = 10
+                        },
+                        new
+                        {
+                            Id = new Guid("620f0bfd-5891-4d19-9add-0645599726a3"),
+                            CategoryDisplayName = "Transaction",
+                            CategoryName = "transaction",
+                            CategorySequence = 20
+                        },
+                        new
+                        {
+                            Id = new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"),
+                            CategoryDisplayName = "Master Data",
+                            CategoryName = "master-data",
+                            CategorySequence = 30
+                        },
+                        new
+                        {
+                            Id = new Guid("2b125185-f2d4-40be-81de-adbbf8932d6d"),
+                            CategoryDisplayName = "General Journal",
+                            CategoryName = "general-journal",
+                            CategorySequence = 40
+                        },
+                        new
+                        {
+                            Id = new Guid("1be8a5b4-43e9-4f25-a737-3ba50ed86e2d"),
+                            CategoryDisplayName = "Purchase",
+                            CategoryName = "purchase",
+                            CategorySequence = 50
+                        },
+                        new
+                        {
+                            Id = new Guid("5f88078c-c20c-4b3c-800e-a976c1140b02"),
+                            CategoryDisplayName = "Sales",
+                            CategoryName = "sales",
+                            CategorySequence = 60
                         });
                 });
 
@@ -650,8 +887,8 @@ namespace WebAPI.Migrations
                     b.HasData(
                         new
                         {
-                            LaundryServiceId = new Guid("24f4688c-0696-4cbc-b9bf-beebf045cd01"),
-                            PriceMenuId = new Guid("c086f307-e7ba-42b4-b4fc-9ee88a66833d"),
+                            LaundryServiceId = new Guid("b8274b3f-b266-4f73-ab55-1697442c2334"),
+                            PriceMenuId = new Guid("93415812-109e-4e6b-a814-2384f48b8ea6"),
                             DeliveryOption = 0,
                             Name = "25 Kgs",
                             Price = 140000m,
@@ -661,8 +898,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("24f4688c-0696-4cbc-b9bf-beebf045cd01"),
-                            PriceMenuId = new Guid("334e12eb-27f1-4884-b477-c9251d9d80f8"),
+                            LaundryServiceId = new Guid("b8274b3f-b266-4f73-ab55-1697442c2334"),
+                            PriceMenuId = new Guid("f5d7dde6-2b27-4a35-ae14-60cced8eb360"),
                             DeliveryOption = 0,
                             Name = "50 Kgs",
                             Price = 275000m,
@@ -672,8 +909,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("24f4688c-0696-4cbc-b9bf-beebf045cd01"),
-                            PriceMenuId = new Guid("78cee24c-15c3-479e-9d69-5898f39bc780"),
+                            LaundryServiceId = new Guid("b8274b3f-b266-4f73-ab55-1697442c2334"),
+                            PriceMenuId = new Guid("690720fe-d787-45f1-8d41-6fabe1ba0114"),
                             DeliveryOption = 0,
                             Name = "100 Kgs",
                             Price = 550000m,
@@ -683,8 +920,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("17316939-27da-4072-9e9f-151f1dcbbf1e"),
-                            PriceMenuId = new Guid("bcb2c904-25e0-4430-b015-3863bcbfc745"),
+                            LaundryServiceId = new Guid("1bc86c21-a291-464a-9f1b-cf1242593d62"),
+                            PriceMenuId = new Guid("a301b3cf-0501-4be8-a3d7-799324a8dcad"),
                             DeliveryOption = 0,
                             Name = "25 Kgs",
                             Price = 120000m,
@@ -694,8 +931,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("17316939-27da-4072-9e9f-151f1dcbbf1e"),
-                            PriceMenuId = new Guid("6b1a7b00-24fc-4fce-843e-dcf3360d5a61"),
+                            LaundryServiceId = new Guid("1bc86c21-a291-464a-9f1b-cf1242593d62"),
+                            PriceMenuId = new Guid("90cb7a61-7b4b-4c11-8de9-bdceaaeb67bf"),
                             DeliveryOption = 0,
                             Name = "50 Kgs",
                             Price = 240000m,
@@ -705,8 +942,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("17316939-27da-4072-9e9f-151f1dcbbf1e"),
-                            PriceMenuId = new Guid("b41e6970-585c-490d-beb5-0c778d5a82fd"),
+                            LaundryServiceId = new Guid("1bc86c21-a291-464a-9f1b-cf1242593d62"),
+                            PriceMenuId = new Guid("4bfbb1f2-bab1-48e1-8004-fe711d3c2db0"),
                             DeliveryOption = 0,
                             Name = "100 Kgs",
                             Price = 475000m,
@@ -716,8 +953,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
-                            PriceMenuId = new Guid("4fc0e852-47c1-4d52-b36b-6166003a001a"),
+                            LaundryServiceId = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
+                            PriceMenuId = new Guid("06282237-afa5-494d-a481-eb8918a39efe"),
                             DeliveryOption = 1,
                             Name = "Bawahan",
                             Price = 10000m,
@@ -727,8 +964,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
-                            PriceMenuId = new Guid("08fbed71-be1b-4d7c-bbc9-df5376dcffca"),
+                            LaundryServiceId = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
+                            PriceMenuId = new Guid("227c686a-cf81-46b8-9674-a68a8192d819"),
                             DeliveryOption = 1,
                             Name = "Atasan",
                             Price = 10000m,
@@ -738,8 +975,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
-                            PriceMenuId = new Guid("c92ca872-6ee2-471b-a807-0064028afcae"),
+                            LaundryServiceId = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
+                            PriceMenuId = new Guid("f4691731-9614-4ab4-9b86-425b3e7732c1"),
                             DeliveryOption = 1,
                             Name = "Jas",
                             Price = 20000m,
@@ -749,8 +986,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
-                            PriceMenuId = new Guid("3f3d13a8-1845-493f-865d-50934dd13385"),
+                            LaundryServiceId = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
+                            PriceMenuId = new Guid("f877003c-362c-4f6d-b185-9a0327c65077"),
                             DeliveryOption = 1,
                             Name = "Jas Set",
                             Price = 30000m,
@@ -760,8 +997,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
-                            PriceMenuId = new Guid("aed413e7-7a42-4a77-beab-9cc58a4d0b33"),
+                            LaundryServiceId = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
+                            PriceMenuId = new Guid("817659dc-6674-4b77-95a3-10416611d935"),
                             DeliveryOption = 1,
                             Name = "Blazer",
                             Price = 15000m,
@@ -771,8 +1008,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
-                            PriceMenuId = new Guid("5f96413b-8a34-4736-a53c-7ed0ba04ba45"),
+                            LaundryServiceId = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
+                            PriceMenuId = new Guid("352fa960-6053-4aca-961a-94d870954527"),
                             DeliveryOption = 1,
                             Name = "Blazer Set",
                             Price = 25000m,
@@ -782,8 +1019,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
-                            PriceMenuId = new Guid("98e98c39-7d42-436a-bfa9-ffbfa93f8676"),
+                            LaundryServiceId = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
+                            PriceMenuId = new Guid("adf049ee-f4ce-41ce-ae3d-185acfadfb87"),
                             DeliveryOption = 1,
                             Name = "Dress Panjang",
                             Price = 15000m,
@@ -793,8 +1030,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
-                            PriceMenuId = new Guid("3a5ec84a-f4da-46cc-8e58-9e7f0f053172"),
+                            LaundryServiceId = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
+                            PriceMenuId = new Guid("ab8c2990-7887-4712-8116-5351904f884e"),
                             DeliveryOption = 1,
                             Name = "Dress Pendek",
                             Price = 15000m,
@@ -804,8 +1041,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
-                            PriceMenuId = new Guid("43ac258a-ecc4-47fe-a5a0-4b4d59b42b3c"),
+                            LaundryServiceId = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
+                            PriceMenuId = new Guid("9c61ed8d-45b5-4691-a7e3-0592c5f9cad3"),
                             DeliveryOption = 1,
                             Name = "Jaket/Sweater",
                             Price = 15000m,
@@ -815,8 +1052,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
-                            PriceMenuId = new Guid("dec69d42-6def-459f-8a50-ed5d08fe5771"),
+                            LaundryServiceId = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
+                            PriceMenuId = new Guid("103df9db-ced7-4890-b1ef-edefcce52419"),
                             DeliveryOption = 1,
                             Name = "Handuk Besar",
                             Price = 7000m,
@@ -826,8 +1063,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("c1e34235-5f6c-4549-9c27-f0feee77c4cc"),
-                            PriceMenuId = new Guid("a9c6093c-ad08-4d64-9e11-6dc5578c8e9c"),
+                            LaundryServiceId = new Guid("5855f493-a1b8-423a-8160-db046a751d3c"),
+                            PriceMenuId = new Guid("f0c22a66-79ff-4be3-bf79-436bf2fa365b"),
                             DeliveryOption = 1,
                             Name = "Handuk Sedang",
                             Price = 6000m,
@@ -837,8 +1074,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("79557007-dc13-4a39-831d-d9bf0b17cd38"),
-                            PriceMenuId = new Guid("845c49c4-99db-4f81-9c90-78b446abb1d8"),
+                            LaundryServiceId = new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"),
+                            PriceMenuId = new Guid("f5425152-0634-457e-94f5-910b4a27a5a3"),
                             DeliveryOption = 1,
                             Name = "Sepatu",
                             Price = 25000m,
@@ -848,8 +1085,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("79557007-dc13-4a39-831d-d9bf0b17cd38"),
-                            PriceMenuId = new Guid("f90f1bef-b84b-4380-ac67-e715f065463e"),
+                            LaundryServiceId = new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"),
+                            PriceMenuId = new Guid("37b22bed-6c1e-4f86-bb2d-b98d51af44ab"),
                             DeliveryOption = 1,
                             Name = "Tas Besar",
                             Price = 30000m,
@@ -859,8 +1096,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("79557007-dc13-4a39-831d-d9bf0b17cd38"),
-                            PriceMenuId = new Guid("4af17f1e-e195-4588-9a83-1e345f772d19"),
+                            LaundryServiceId = new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"),
+                            PriceMenuId = new Guid("80531b22-8b1a-4686-8cc1-8847b5f4727f"),
                             DeliveryOption = 1,
                             Name = "Tas Sedang",
                             Price = 25000m,
@@ -870,8 +1107,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("79557007-dc13-4a39-831d-d9bf0b17cd38"),
-                            PriceMenuId = new Guid("5fab4a4f-a337-46dc-88d4-70bbd1bb39ee"),
+                            LaundryServiceId = new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"),
+                            PriceMenuId = new Guid("65cf5865-626b-40f2-8965-fb39e2bc3aa5"),
                             DeliveryOption = 1,
                             Name = "Tas Kecil",
                             Price = 15000m,
@@ -881,8 +1118,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("79557007-dc13-4a39-831d-d9bf0b17cd38"),
-                            PriceMenuId = new Guid("c01d3528-de64-4373-af8b-35c9789d1e90"),
+                            LaundryServiceId = new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"),
+                            PriceMenuId = new Guid("14952d2e-9050-4317-bc01-fc7f4b4e8582"),
                             DeliveryOption = 1,
                             Name = "Tas Mini",
                             Price = 10000m,
@@ -892,8 +1129,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("8cd87758-7af4-4b0d-a3d1-798fc26d65b8"),
-                            PriceMenuId = new Guid("d5f5f01e-3b91-4a7c-9004-9e335a59930d"),
+                            LaundryServiceId = new Guid("9dcfba5f-8deb-48fb-8e7a-1e89972576f1"),
+                            PriceMenuId = new Guid("7b791afa-bc83-490b-8a7a-21ffa603ca7b"),
                             DeliveryOption = 1,
                             Name = "Reguler",
                             Price = 6000m,
@@ -903,8 +1140,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("8cd87758-7af4-4b0d-a3d1-798fc26d65b8"),
-                            PriceMenuId = new Guid("b6a7d82c-dd29-4319-8da2-790479e657cc"),
+                            LaundryServiceId = new Guid("9dcfba5f-8deb-48fb-8e7a-1e89972576f1"),
+                            PriceMenuId = new Guid("77ccb963-7d8e-4383-abd9-f6f1c65046fc"),
                             DeliveryOption = 2,
                             Name = "One Day",
                             Price = 8000m,
@@ -914,8 +1151,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("8cd87758-7af4-4b0d-a3d1-798fc26d65b8"),
-                            PriceMenuId = new Guid("889c7b44-d349-4dbe-9be5-e25b1193d9a3"),
+                            LaundryServiceId = new Guid("9dcfba5f-8deb-48fb-8e7a-1e89972576f1"),
+                            PriceMenuId = new Guid("77055c24-49ff-408a-bff3-cd779550299b"),
                             DeliveryOption = 4,
                             Name = "Express",
                             Price = 10000m,
@@ -925,8 +1162,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("81fca663-9d6f-4d57-88bf-60572d75bd27"),
-                            PriceMenuId = new Guid("3a43e75b-f4a9-46b5-992e-42c0a5416220"),
+                            LaundryServiceId = new Guid("79d6307f-0a2d-434b-9369-14ca2a7b0964"),
+                            PriceMenuId = new Guid("6531c6f0-d57c-4545-a970-50d19dc1d6c5"),
                             DeliveryOption = 1,
                             Name = "Reguler",
                             Price = 5000m,
@@ -936,8 +1173,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("81fca663-9d6f-4d57-88bf-60572d75bd27"),
-                            PriceMenuId = new Guid("f29c039b-758d-4c61-9df2-1bbacb84df45"),
+                            LaundryServiceId = new Guid("79d6307f-0a2d-434b-9369-14ca2a7b0964"),
+                            PriceMenuId = new Guid("336e869a-22b2-4916-9fa3-62c35a7053ff"),
                             DeliveryOption = 2,
                             Name = "One Day",
                             Price = 7000m,
@@ -947,8 +1184,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("81fca663-9d6f-4d57-88bf-60572d75bd27"),
-                            PriceMenuId = new Guid("067b1d37-b571-4b5f-9d08-26ff4e554650"),
+                            LaundryServiceId = new Guid("79d6307f-0a2d-434b-9369-14ca2a7b0964"),
+                            PriceMenuId = new Guid("88df50cd-64da-4390-8931-0c68eea0b0ce"),
                             DeliveryOption = 4,
                             Name = "Express",
                             Price = 9000m,
@@ -958,8 +1195,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("0aea0c48-4670-46f0-8fef-6c458fad04e4"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("b1164962-4589-4ab4-acf9-ef5f57c4fbe1"),
                             DeliveryOption = 1,
                             Name = "Bed Cover King Set",
                             Price = 38000m,
@@ -969,8 +1206,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("7aeb0f91-6136-484c-ae71-38e99b45ea62"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("90793a83-075e-4c24-a604-978d52c23b73"),
                             DeliveryOption = 1,
                             Name = "Bed Cover Queen Set",
                             Price = 35000m,
@@ -980,8 +1217,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("034f695b-fb6b-4d05-bd83-1e3e2e18df24"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("622051d4-33cb-4846-a243-04de8261acf1"),
                             DeliveryOption = 1,
                             Name = "Bed Cover Single Set",
                             Price = 27000m,
@@ -991,8 +1228,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("66ec3a9e-7c28-4b89-906c-453f7f333343"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("21e00ace-3d3d-4d7d-9fc0-fada6f52c3c6"),
                             DeliveryOption = 1,
                             Name = "Bed Cover King",
                             Price = 25000m,
@@ -1002,8 +1239,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("2941b8ed-e5f4-4987-b3ec-956ae30a8095"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("c6b6f8b1-f615-4a23-947d-cee89666bfca"),
                             DeliveryOption = 1,
                             Name = "Bed Cover Queen",
                             Price = 20000m,
@@ -1013,8 +1250,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("2c153408-28e9-4cbf-a233-33c99d7a8481"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("c2cfa26c-2649-40ee-8ff4-e91e558e3cbd"),
                             DeliveryOption = 1,
                             Name = "Bed Cover Single",
                             Price = 15000m,
@@ -1024,8 +1261,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("012356fc-52f4-40cf-9555-1555249db7d0"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("5823c7a2-6f8d-496b-8986-67a602d007c4"),
                             DeliveryOption = 1,
                             Name = "Selimut",
                             Price = 15000m,
@@ -1035,8 +1272,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("7776add1-ea90-4104-9c61-08a4bbe398ab"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("6b9465d1-2dcf-4ae4-91fb-255ab18be15b"),
                             DeliveryOption = 1,
                             Name = "Selimut Tipis",
                             Price = 10000m,
@@ -1046,8 +1283,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("865c44f6-8606-4dc0-bd11-b51c9c1b8f35"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("26b20d9e-d00b-412f-bd13-8e7d58336ec0"),
                             DeliveryOption = 4,
                             Name = "Bed Cover King Set",
                             Price = 76000m,
@@ -1057,8 +1294,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("c37628e1-a20f-461d-aafe-1aa4d3438b10"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("952c1f81-a383-4459-828f-07fdccec5b5c"),
                             DeliveryOption = 4,
                             Name = "Bed Cover Queen Set",
                             Price = 70000m,
@@ -1068,8 +1305,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("7429d8ac-c51f-4783-b3ac-4822ddf3e623"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("5050f5fe-8ade-4a37-83dc-aee897fa3ba1"),
                             DeliveryOption = 4,
                             Name = "Bed Cover Single Set",
                             Price = 54000m,
@@ -1079,8 +1316,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("f315c1c9-cca5-4054-bc80-e09ec4ce9713"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("ff69965c-46b5-4e7c-87cf-1ce32d7d3ed4"),
                             DeliveryOption = 4,
                             Name = "Bed Cover King",
                             Price = 50000m,
@@ -1090,8 +1327,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("74b14ddf-b7cc-47d7-b1c0-805c0cda254f"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("3dabc956-38e5-4dfe-ab06-20ba116b5699"),
                             DeliveryOption = 4,
                             Name = "Bed Cover Queen",
                             Price = 40000m,
@@ -1101,8 +1338,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("a1df3c83-179c-49d3-99aa-63bca1167db2"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("c5b7cfe8-62dd-4b12-877d-7f2e7bd874bf"),
                             DeliveryOption = 4,
                             Name = "Bed Cover Single",
                             Price = 30000m,
@@ -1112,8 +1349,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("be8dacea-4048-4e23-9cf8-c0315eb25311"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("561db35f-040d-4b3d-a12b-3a71c8ed78d1"),
                             DeliveryOption = 4,
                             Name = "Selimut",
                             Price = 30000m,
@@ -1123,8 +1360,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("35142756-3afd-477b-9248-a75eab53a95e"),
-                            PriceMenuId = new Guid("2fb750c9-dfc5-47a2-8759-124f01061e29"),
+                            LaundryServiceId = new Guid("3170542f-2798-4e04-a611-513030deeb60"),
+                            PriceMenuId = new Guid("df8d34f4-a955-4b2a-8a43-e7037554106f"),
                             DeliveryOption = 4,
                             Name = "Selimut Tipis",
                             Price = 20000m,
@@ -1134,8 +1371,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("26f330d9-b716-4947-b318-430719eb06b8"),
-                            PriceMenuId = new Guid("9e330b40-4a53-45ae-8fff-501c6d5f5196"),
+                            LaundryServiceId = new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"),
+                            PriceMenuId = new Guid("08f1bea0-3a28-448b-96ff-22276e9236a9"),
                             DeliveryOption = 1,
                             Name = "Sprei King Set",
                             Price = 20000m,
@@ -1145,8 +1382,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("26f330d9-b716-4947-b318-430719eb06b8"),
-                            PriceMenuId = new Guid("185ab6b1-5920-49c8-9f19-0d2e2d52e5ab"),
+                            LaundryServiceId = new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"),
+                            PriceMenuId = new Guid("5417a310-57bb-40c4-9c35-0d567979824f"),
                             DeliveryOption = 1,
                             Name = "Sprei Quen Set",
                             Price = 20000m,
@@ -1156,8 +1393,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("26f330d9-b716-4947-b318-430719eb06b8"),
-                            PriceMenuId = new Guid("519a7bea-2a73-4074-a6d3-1060545265e4"),
+                            LaundryServiceId = new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"),
+                            PriceMenuId = new Guid("72f41098-5f5b-40c2-b6c0-54ad4447630f"),
                             DeliveryOption = 1,
                             Name = "Sprei Single Set",
                             Price = 15000m,
@@ -1167,8 +1404,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("26f330d9-b716-4947-b318-430719eb06b8"),
-                            PriceMenuId = new Guid("05baa46f-a786-412b-afba-83fcf32b7524"),
+                            LaundryServiceId = new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"),
+                            PriceMenuId = new Guid("e8622568-908b-4b42-9fb0-52663a3b4ef3"),
                             DeliveryOption = 1,
                             Name = "Sprei King",
                             Price = 15000m,
@@ -1178,8 +1415,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("26f330d9-b716-4947-b318-430719eb06b8"),
-                            PriceMenuId = new Guid("6e171c25-7730-4764-83a5-7f84e95e99a9"),
+                            LaundryServiceId = new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"),
+                            PriceMenuId = new Guid("32f1fead-42d6-431a-8438-520e7874362e"),
                             DeliveryOption = 1,
                             Name = "Sprei Queen",
                             Price = 15000m,
@@ -1189,8 +1426,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("26f330d9-b716-4947-b318-430719eb06b8"),
-                            PriceMenuId = new Guid("77789a6e-cc71-44bf-bee1-6e3d1bdf5b4a"),
+                            LaundryServiceId = new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"),
+                            PriceMenuId = new Guid("110572e4-5446-4464-adb8-00bd33e8f50d"),
                             DeliveryOption = 1,
                             Name = "Sprei Single",
                             Price = 10000m,
@@ -1200,8 +1437,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("26f330d9-b716-4947-b318-430719eb06b8"),
-                            PriceMenuId = new Guid("aace7aed-4ed7-4c24-be15-b19376c92c28"),
+                            LaundryServiceId = new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"),
+                            PriceMenuId = new Guid("3e02d27d-1b93-4d81-affd-a30bd3087f4e"),
                             DeliveryOption = 1,
                             Name = "Alas Kasur King",
                             Price = 25000m,
@@ -1211,8 +1448,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("26f330d9-b716-4947-b318-430719eb06b8"),
-                            PriceMenuId = new Guid("9f930088-e479-4040-aaab-4580a854e5b9"),
+                            LaundryServiceId = new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"),
+                            PriceMenuId = new Guid("7ff3bd7c-6e24-4e2a-ba0a-df5f8204a066"),
                             DeliveryOption = 1,
                             Name = "Alas Kasur Queen",
                             Price = 20000m,
@@ -1222,8 +1459,8 @@ namespace WebAPI.Migrations
                         },
                         new
                         {
-                            LaundryServiceId = new Guid("26f330d9-b716-4947-b318-430719eb06b8"),
-                            PriceMenuId = new Guid("e2bef248-ee3c-4c90-b60a-8851744722a2"),
+                            LaundryServiceId = new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"),
+                            PriceMenuId = new Guid("1eb8c6cd-a15a-4763-a33c-053afcabc955"),
                             DeliveryOption = 1,
                             Name = "Alas Kasur Single",
                             Price = 15000m,
@@ -1493,6 +1730,21 @@ namespace WebAPI.Migrations
                     b.ToTable("supplier");
                 });
 
+            modelBuilder.Entity("WebAPI.Models.UserMenu", b =>
+                {
+                    b.Property<Guid>("ApplicationUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MenuId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ApplicationUserId", "MenuId");
+
+                    b.HasIndex("MenuId");
+
+                    b.ToTable("user_menu");
+                });
+
             modelBuilder.Entity("WebAPI.Models.ApplicationUserRole", b =>
                 {
                     b.HasOne("WebAPI.Models.ApplicationRole", "ApplicationRole")
@@ -1530,23 +1782,34 @@ namespace WebAPI.Migrations
                     b.Navigation("Currency");
                 });
 
-            modelBuilder.Entity("WebAPI.Models.GeneralAccountDetail", b =>
+            modelBuilder.Entity("WebAPI.Models.GeneralJournalDetail", b =>
                 {
                     b.HasOne("WebAPI.Models.ChartOfAccount", "ChartOfAccount")
-                        .WithMany("GeneralAccountDetails")
+                        .WithMany("GeneralJournalDetails")
                         .HasForeignKey("ChartOfAccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebAPI.Models.GeneralAccountHeader", "GeneralAccountHeader")
-                        .WithMany("GeneralAccountDetails")
-                        .HasForeignKey("GeneralAccountHeaderId")
+                    b.HasOne("WebAPI.Models.GeneralJournalHeader", "GeneralJournalHeader")
+                        .WithMany("GeneralJournalDetails")
+                        .HasForeignKey("GeneralJournalHeaderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ChartOfAccount");
 
-                    b.Navigation("GeneralAccountHeader");
+                    b.Navigation("GeneralJournalHeader");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.Menu", b =>
+                {
+                    b.HasOne("WebAPI.Models.MenuCategory", "MenuCategory")
+                        .WithMany("Menus")
+                        .HasForeignKey("MenuCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MenuCategory");
                 });
 
             modelBuilder.Entity("WebAPI.Models.PriceMenu", b =>
@@ -1660,6 +1923,25 @@ namespace WebAPI.Migrations
                     b.Navigation("Currency");
                 });
 
+            modelBuilder.Entity("WebAPI.Models.UserMenu", b =>
+                {
+                    b.HasOne("WebAPI.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("UserMenus")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebAPI.Models.Menu", "Menu")
+                        .WithMany("UserMenus")
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Menu");
+                });
+
             modelBuilder.Entity("WebAPI.Models.ApplicationRole", b =>
                 {
                     b.Navigation("UserRoles");
@@ -1667,12 +1949,14 @@ namespace WebAPI.Migrations
 
             modelBuilder.Entity("WebAPI.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("UserMenus");
+
                     b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("WebAPI.Models.ChartOfAccount", b =>
                 {
-                    b.Navigation("GeneralAccountDetails");
+                    b.Navigation("GeneralJournalDetails");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Customer", b =>
@@ -1680,9 +1964,9 @@ namespace WebAPI.Migrations
                     b.Navigation("SalesHeaders");
                 });
 
-            modelBuilder.Entity("WebAPI.Models.GeneralAccountHeader", b =>
+            modelBuilder.Entity("WebAPI.Models.GeneralJournalHeader", b =>
                 {
-                    b.Navigation("GeneralAccountDetails");
+                    b.Navigation("GeneralJournalDetails");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Inventory", b =>
@@ -1693,6 +1977,16 @@ namespace WebAPI.Migrations
             modelBuilder.Entity("WebAPI.Models.LaundryService", b =>
                 {
                     b.Navigation("PriceMenus");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.Menu", b =>
+                {
+                    b.Navigation("UserMenus");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.MenuCategory", b =>
+                {
+                    b.Navigation("Menus");
                 });
 
             modelBuilder.Entity("WebAPI.Models.PriceMenu", b =>
