@@ -10,6 +10,7 @@ using WebAPI.Exception;
 using WebAPI.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
+//var builder = WebApplication.CreateBuilder(new WebApplicationOptions { EnvironmentName = "Development", ApplicationName = "Blue Wash API"});
 
 // Add services to the container.
 
@@ -18,19 +19,31 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: AllowedOrigins, policy =>
     {
-        policy.WithOrigins("http://localhost:5173");
-        policy.WithHeaders(new[] { "Content-Type", "Authorization" });
-        policy.WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+        policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+              .WithHeaders("Content-Type", "Authorization")
+              .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+              .AllowCredentials();
     });
+});
+
+builder.Services.AddCookiePolicy(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
+    options.Secure = CookieSecurePolicy.Always;
+
 });
 
 builder.Services.AddControllers(options =>
 {
+    options.Filters.Add<UserNotFoundExceptionFilter>();
     options.Filters.Add<DatabaseReadExceptionFilter>();
     options.Filters.Add<DatabaseInsertExceptionFilter>();
     options.Filters.Add<DatabaseUpdateExceptionFilter>();
     options.Filters.Add<DatabaseDeleteExceptionFilter>();
     options.Filters.Add<DatabaseUniqueConstraintExceptionFilter>();
+    options.Filters.Add<UnauthorizedAccessExceptionFilter>();
+    options.Filters.Add<InvalidDataExceptionFilter>();
 
 }).AddNewtonsoftJson(options =>
 {
@@ -70,17 +83,21 @@ builder.Services.AddTransient<IJwtProvider, JwtProvider>();
 builder.Services.ConfigureOptions<JwtOptionsSetup>();
 builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
 
+builder.Services.AddScoped<IAccessRightRepository, AccessRightRepository>();
 builder.Services.AddScoped<ILaundryServiceRepository, LaundryServiceRepository>();
 builder.Services.AddScoped<IPriceMenuRepository, PriceMenuRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+builder.Services.AddScoped<IChartOfAccountRepository, ChartOfAccountRepository>();
 builder.Services.AddScoped<ISalesRepository, SalesRepository>();
 builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 builder.Services.AddScoped<IGeneralJournalRepository, GeneralJournalRepository>();
 
 
 var app = builder.Build();
+app.UseCors(AllowedOrigins);
+app.UseCookiePolicy();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -97,7 +114,6 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("X-Frame-Options", "DENY");
     context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
     context.Response.Headers.Add("Referrer-Policy", "strict-origin-when-cross-origin");
-    context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:5173");
     await next();
 });
 
@@ -106,7 +122,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseCors(AllowedOrigins);
 
 using (var scope = app.Services.CreateAsyncScope())
 {
