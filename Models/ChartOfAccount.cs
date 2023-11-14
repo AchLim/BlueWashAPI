@@ -34,7 +34,7 @@ namespace WebAPI.Models
         public Guid? CurrencyId { get; set; }
 
         // FK - General Account Detail
-        public ICollection<GeneralAccountDetail>? GeneralAccountDetails { get; set; }
+        public ICollection<GeneralJournalDetail>? GeneralJournalDetails { get; set; }
 
         // Auditable
         public DateTime? Created { get; set; }
