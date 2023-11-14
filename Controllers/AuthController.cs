@@ -1,23 +1,12 @@
-using BCrypt.Net;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
 using WebAPI.Authentication;
-using WebAPI.DAL;
 using WebAPI.Data;
+using WebAPI.Exception;
 using WebAPI.Models;
-using WebAPI.Models.DTO;
-using WebAPI.Models.Mapper;
-using WebAPI.Utility;
+using InvalidDataException = WebAPI.Exception.InvalidDataException;
 
 namespace WebAPI.Controllers
 {
@@ -41,7 +30,7 @@ namespace WebAPI.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginDto login)
+        public async Task<IActionResult> LoginAsync([FromBody] LoginDto login)
         {
             ApplicationUser? user = null;
             await using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -77,37 +66,44 @@ namespace WebAPI.Controllers
             }
             if (user is null)
             {
-                return BadRequest("Akun tidak valid!");
+                throw new UserNotFoundException("Kredensial tidak valid!");
             }
+
             if (!BCrypt.Net.BCrypt.Verify(login.Password, user.PasswordHash))
             {
-                return BadRequest("Akun tidak valid!");
+                throw new UserNotFoundException("Kredensial tidak valid!");
             }
 
             string token = _jwtProvider.Generate(user);
 
+            Response.Cookies.Append("_bw_id", user.RefreshToken,
+                new CookieOptions { MaxAge = TimeSpan.FromHours(12) });
+
             return Ok(new
             {
+                username = user.Username,
                 accessToken = token,
-                refreshToken = user.RefreshToken
             });
         }
 
-        [HttpPost("refresh-token")]
+        [HttpGet("refresh-token")]
         [AllowAnonymous]
-        public async Task<ActionResult<string>> RefreshToken([FromBody] RefreshBody refreshBody)
+        public async Task<ActionResult<string>> RefreshTokenAsync()
         {
-            if (refreshBody.RefreshToken.Trim() == string.Empty)
-            {
-                return Forbid();
-            }
+            string? refreshToken = Request.Cookies["_bw_id"];
+
+            if (refreshToken == null)
+                return Unauthorized();
+
+            if (refreshToken.Trim() == string.Empty)
+                throw new InvalidDataException("Token autentikasi kedaluwarsa atau tidak ditemukan. Harap login kembali untuk melanjutkan.");
 
             ApplicationUser? user = null;
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    user = await _context.Users.Where(user => user.RefreshToken.Equals(refreshBody.RefreshToken)).FirstOrDefaultAsync();
+                    user = await _context.Users.Where(user => user.RefreshToken.Equals(refreshToken)).FirstOrDefaultAsync();
 
 
                     if (user is not null)
@@ -147,13 +143,58 @@ namespace WebAPI.Controllers
 
             string token = _jwtProvider.Generate(user);
 
+            Response.Cookies.Append("_bw_id", user.RefreshToken,
+                new CookieOptions { MaxAge = TimeSpan.FromHours(12) });
 
             return Ok(new
             {
-                user = user.Login,
+                username = user.Username,
                 accessToken = token,
-                refreshToken = user.RefreshToken
             });
+        }
+
+        [HttpGet("get-name")]
+        public async Task<ActionResult<string>> GetNameAsync()
+        {
+            string? refreshToken = Request.Cookies["_bw_id"];
+
+            if (refreshToken == null)
+                return Unauthorized();
+
+            if (refreshToken.Trim() == string.Empty)
+                throw new InvalidDataException("Token autentikasi kedaluwarsa atau tidak ditemukan. Harap login kembali untuk melanjutkan.");
+
+
+            ApplicationUser? user = null;
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    user = await _context.Users.Where(user => user.RefreshToken.Equals(refreshToken)).FirstOrDefaultAsync();
+
+
+                    if (user is not null)
+                    {
+                        if (user.TokenExpiration < DateTime.Now)
+                        {
+                            return Unauthorized("Token Expired.");
+                        }
+                    }
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    return BadRequest("Terjadi kesalahan pada database.");
+                }
+            }
+
+            if (user is null)
+            {
+                return Unauthorized();
+            }
+
+            return user.Username;
+
         }
 
         private static RefreshToken GenerateRefreshToken()
@@ -174,8 +215,4 @@ namespace WebAPI.Controllers
         public required string Password { get; set; }
 }
 
-    public class RefreshBody
-    {
-        public string RefreshToken { get; set; } = string.Empty;
-    }
 }
