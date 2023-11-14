@@ -34,7 +34,7 @@ namespace WebAPI.Models
         public DateTime TokenCreation { get; set; }
         public DateTime TokenExpiration { get; set; }
 
-
         public virtual ICollection<ApplicationUserRole>? UserRoles { get; set; }
+        public virtual ICollection<UserMenu>? UserMenus { get; set; }
     }
 }
