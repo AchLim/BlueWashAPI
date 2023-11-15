@@ -6,19 +6,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebAPI.Models
 {
-    [Table("general_journal_detail")]
-    [PrimaryKey(nameof(GeneralJournalHeaderId), nameof(GeneralJournalDetailId))]
-    public class GeneralJournalDetail : IAuditable
+    [Table("journal_item")]
+    [PrimaryKey(nameof(JournalEntryId), nameof(JournalItemId))]
+    public class JournalItem : IAuditable
     {
         [Column(Order = 0)]
-        public Guid GeneralJournalHeaderId { get; set; }
+        public Guid JournalEntryId { get; set; }
 
         [Column(Order = 1)]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid GeneralJournalDetailId { get; set; }
+        public Guid JournalItemId { get; set; }
 
         [Required]
-        public virtual GeneralJournalHeader GeneralJournalHeader { get; set; } = default!;
+        public virtual JournalEntry JournalEntry { get; set; } = default!;
 
         [Required]
         public virtual ChartOfAccount ChartOfAccount { get; set; } = default!;

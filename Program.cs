@@ -92,7 +92,7 @@ builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 builder.Services.AddScoped<IChartOfAccountRepository, ChartOfAccountRepository>();
 builder.Services.AddScoped<ISalesRepository, SalesRepository>();
 builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
-builder.Services.AddScoped<IGeneralJournalRepository, GeneralJournalRepository>();
+builder.Services.AddScoped<IJournalEntryRepository, JournalEntryRepository>();
 
 
 var app = builder.Build();

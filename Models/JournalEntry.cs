@@ -7,9 +7,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebAPI.Models
 {
-    [Table("general_journal_header")]
+    [Table("journal_entry")]
     [Index(nameof(TransactionNo), IsUnique = true)]
-    public class GeneralJournalHeader : IAuditable
+    public class JournalEntry : IAuditable
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
@@ -26,8 +26,8 @@ namespace WebAPI.Models
         [DisplayName("Deskripsi")]
         public string? Description { get; set; }
 
-        // FK - General Journal Detail
-        public ICollection<GeneralJournalDetail>? GeneralJournalDetails { get; set; }
+        // FK - Journal Item
+        public ICollection<JournalItem>? JournalItems { get; set; }
 
         // Auditable
         public DateTime? Created { get; set; }

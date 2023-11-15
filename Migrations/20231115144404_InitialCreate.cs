@@ -32,24 +32,6 @@ namespace WebAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "general_journal_header",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TransactionNo = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
-                    TransactionDate = table.Column<DateTime>(type: "date", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Created = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_general_journal_header", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "inventory",
                 columns: table => new
                 {
@@ -64,6 +46,24 @@ namespace WebAPI.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_inventory", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "journal_entry",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TransactionNo = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
+                    TransactionDate = table.Column<DateTime>(type: "date", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_journal_entry", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -275,11 +275,11 @@ namespace WebAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "general_journal_detail",
+                name: "journal_item",
                 columns: table => new
                 {
-                    GeneralJournalHeaderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    GeneralJournalDetailId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    JournalEntryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    JournalItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ChartOfAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Debit = table.Column<decimal>(type: "decimal(19,4)", precision: 19, scale: 4, nullable: false),
                     Credit = table.Column<decimal>(type: "decimal(19,4)", precision: 19, scale: 4, nullable: false),
@@ -290,17 +290,17 @@ namespace WebAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_general_journal_detail", x => new { x.GeneralJournalHeaderId, x.GeneralJournalDetailId });
+                    table.PrimaryKey("PK_journal_item", x => new { x.JournalEntryId, x.JournalItemId });
                     table.ForeignKey(
-                        name: "FK_general_journal_detail_chart_of_account_ChartOfAccountId",
+                        name: "FK_journal_item_chart_of_account_ChartOfAccountId",
                         column: x => x.ChartOfAccountId,
                         principalTable: "chart_of_account",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_general_journal_detail_general_journal_header_GeneralJournalHeaderId",
-                        column: x => x.GeneralJournalHeaderId,
-                        principalTable: "general_journal_header",
+                        name: "FK_journal_item_journal_entry_JournalEntryId",
+                        column: x => x.JournalEntryId,
+                        principalTable: "journal_entry",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -488,25 +488,25 @@ namespace WebAPI.Migrations
                 columns: new[] { "Id", "AccountHeaderName", "AccountHeaderNo", "AccountName", "AccountNo", "Created", "CreatedBy", "CurrencyId", "LastModified", "LastModifiedBy" },
                 values: new object[,]
                 {
-                    { new Guid("126bba2e-af19-4b10-8987-9cb6ef6ddbcc"), "Asset", 100, "Sewa dibayar di muka", 115, null, null, null, null, null },
-                    { new Guid("20e9e0be-7446-41a0-9893-584d45b80175"), "Asset", 100, "Kas", 111, null, null, null, null, null },
-                    { new Guid("3808a200-1676-4e3b-8b0f-ece3b72daa61"), "Liabilitas", 200, "Utang Usaha", 201, null, null, null, null, null },
-                    { new Guid("5745b241-3359-455f-9eec-f05fa4100458"), "Asset", 100, "Bank", 112, null, null, null, null, null },
-                    { new Guid("76b37fdd-f6b2-4744-8ee1-9325ee315013"), "Asset", 100, "Peralatan", 121, null, null, null, null, null },
-                    { new Guid("7e258f97-8875-4ee7-a121-c8a7b604930e"), "Pengeluaran", 600, "Beban Depresiasi", 606, null, null, null, null, null },
-                    { new Guid("7f9d2f5b-b3ca-4ab6-828b-ee0bdb3afc13"), "Pengeluaran", 600, "Beban Utilitas", 603, null, null, null, null, null },
-                    { new Guid("8e716434-a6a7-4ab7-81c7-c673a8e405c4"), "Pengeluaran", 600, "Beban Perlengkapan", 605, null, null, null, null, null },
-                    { new Guid("91effaa7-34f4-4527-960e-100decafd25c"), "Harga Pokok Penjualan", 500, "Pembelian", 501, null, null, null, null, null },
-                    { new Guid("9472ca38-f325-4e7e-8df2-a8335647fb16"), "Asset", 100, "Perlengkapan", 114, null, null, null, null, null },
-                    { new Guid("9c7b506c-04fb-45e9-af53-d53c44f9f6b1"), "Pengeluaran", 600, "Beban Sewa", 602, null, null, null, null, null },
-                    { new Guid("9f275366-66bc-4a84-b6bb-4d97cc19a19f"), "Pendapatan", 400, "Pendapatan Penjualan", 401, null, null, null, null, null },
-                    { new Guid("c5bb4cb1-58f9-44ea-99ad-832bc3d8aea1"), "Asset", 100, "Persediaan", 113, null, null, null, null, null },
-                    { new Guid("c8005361-1a02-4f01-a1c7-1302a2070a8b"), "Harga Pokok Penjualan", 500, "Persediaan Akhir", 521, null, null, null, null, null },
-                    { new Guid("d1e17d8f-992f-4122-8dd7-de46a057d615"), "Harga Pokok Penjualan", 500, "Persediaan Awal", 511, null, null, null, null, null },
-                    { new Guid("d86a09a8-9275-4d49-8ebc-9247a0e1e294"), "Ekuitas", 300, "Ekuitas Pemilik Usaha", 301, null, null, null, null, null },
-                    { new Guid("d9328084-7759-44a4-ab91-2a0f1d53818b"), "Pengeluaran", 600, "Beban Listrik", 604, null, null, null, null, null },
-                    { new Guid("e49061b6-4e61-4114-8118-c5e753a87fc6"), "Pengeluaran", 600, "Beban Gaji", 601, null, null, null, null, null },
-                    { new Guid("f4e5f9c5-87ba-43c3-ab16-14fa6e6a3c7f"), "Asset", 100, "Akumulasi Depresiasi - Mesin Cuci", 122, null, null, null, null, null }
+                    { new Guid("04dde26e-1653-4216-9146-7f7309ce0900"), "Pendapatan", 400, "Pendapatan Penjualan", 401, null, null, null, null, null },
+                    { new Guid("0eb1017b-3d4a-4e3a-840e-e817947e5338"), "Pengeluaran", 600, "Beban Sewa", 602, null, null, null, null, null },
+                    { new Guid("1adeb7d2-34b2-414e-920c-d00e77473961"), "Pengeluaran", 600, "Beban Depresiasi", 606, null, null, null, null, null },
+                    { new Guid("23e10c87-1cad-40e3-81e2-bcbe8b27d151"), "Harga Pokok Penjualan", 500, "Persediaan Akhir", 521, null, null, null, null, null },
+                    { new Guid("35a11db0-16bb-4a2d-884e-9e1517b9b57e"), "Harga Pokok Penjualan", 500, "Pembelian", 501, null, null, null, null, null },
+                    { new Guid("4a7fd545-86bf-4fbd-82c7-63f22e2a0769"), "Asset", 100, "Bank", 112, null, null, null, null, null },
+                    { new Guid("86adb522-4548-40e7-9d1f-dddb5737d63e"), "Asset", 100, "Sewa dibayar di muka", 115, null, null, null, null, null },
+                    { new Guid("8f8dafcb-4189-4213-9dff-0dbd8853ee02"), "Pengeluaran", 600, "Beban Utilitas", 603, null, null, null, null, null },
+                    { new Guid("9a1aa71f-23f4-4529-b15b-fa77b22667f5"), "Harga Pokok Penjualan", 500, "Persediaan Awal", 511, null, null, null, null, null },
+                    { new Guid("9f032de8-92b1-4c5f-bbd6-7dc151742df2"), "Liabilitas", 200, "Utang Usaha", 201, null, null, null, null, null },
+                    { new Guid("a076dfe6-8380-4b56-b7f7-b2ba56bf7ee8"), "Pengeluaran", 600, "Beban Listrik", 604, null, null, null, null, null },
+                    { new Guid("a4b163c5-ec78-464e-a6f3-abf4b97cf715"), "Asset", 100, "Persediaan", 113, null, null, null, null, null },
+                    { new Guid("ac3c5609-c66d-4813-9f86-b9e9f3e25389"), "Pengeluaran", 600, "Beban Gaji", 601, null, null, null, null, null },
+                    { new Guid("c7395bdb-5497-4b5e-b325-b4987d8a628f"), "Asset", 100, "Perlengkapan", 114, null, null, null, null, null },
+                    { new Guid("c9177b10-3a3e-4a86-831c-0b04120ee3c2"), "Asset", 100, "Akumulasi Depresiasi - Mesin Cuci", 122, null, null, null, null, null },
+                    { new Guid("ca7cb4dc-802a-4293-b75c-8d05294bbb33"), "Asset", 100, "Peralatan", 121, null, null, null, null, null },
+                    { new Guid("dd2a19fe-87a7-41ca-a6ee-86f518950c3b"), "Asset", 100, "Kas", 111, null, null, null, null, null },
+                    { new Guid("de6d08fc-c38f-4c42-aa5b-519f16d93057"), "Ekuitas", 300, "Ekuitas Pemilik Usaha", 301, null, null, null, null, null },
+                    { new Guid("f31e0ed4-7141-489b-8453-5b579d288cda"), "Pengeluaran", 600, "Beban Perlengkapan", 605, null, null, null, null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -514,10 +514,10 @@ namespace WebAPI.Migrations
                 columns: new[] { "Id", "Code", "Created", "CreatedBy", "CultureName", "LastModified", "LastModifiedBy", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("4e5f5870-e543-4d6b-82ae-c582f9dd746d"), "USD", null, null, "en-US", null, null, "Dollar USD" },
-                    { new Guid("5986c9b3-b392-46b0-82b6-0fe6f0544383"), "MYR", null, null, "ms-MY", null, null, "Ringgit Malaysia" },
-                    { new Guid("c0bc3aee-031e-4c4e-bd51-5bb1fc0f2129"), "IDR", null, null, "id-ID", null, null, "Indonesia Rupiah" },
-                    { new Guid("c83607a0-aa7f-40b6-a5be-bb7e11cbabe6"), "SGD", null, null, "en-SG", null, null, "Dollar Singapore" }
+                    { new Guid("17247749-f3c8-476d-a74c-7c5ed30e00d3"), "SGD", null, null, "en-SG", null, null, "Dollar Singapore" },
+                    { new Guid("176874d6-6c06-48d7-9b63-6fb134e49942"), "IDR", null, null, "id-ID", null, null, "Indonesia Rupiah" },
+                    { new Guid("ae970c42-6ed5-4097-8ab6-845d2473c1b5"), "USD", null, null, "en-US", null, null, "Dollar USD" },
+                    { new Guid("af28147c-d8bd-428b-ad8e-095d596a13ea"), "MYR", null, null, "ms-MY", null, null, "Ringgit Malaysia" }
                 });
 
             migrationBuilder.InsertData(
@@ -525,16 +525,16 @@ namespace WebAPI.Migrations
                 columns: new[] { "Id", "Created", "CreatedBy", "LastModified", "LastModifiedBy", "LaundryProcess", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("1278cc21-6dd5-4524-be6e-70abf62fa72d"), null, null, null, null, 3, "BANTAL/BONEKA" },
-                    { new Guid("1bc86c21-a291-464a-9f1b-cf1242593d62"), null, null, null, null, 4, "PAKET BULANAN SETRIKA" },
-                    { new Guid("253194b4-064a-45db-ba44-9105a26e1065"), null, null, null, null, 3, "KARPET/GORDEN" },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), null, null, null, null, 3, "BED COVER & SELIMUT" },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), null, null, null, null, 3, "SATUAN" },
-                    { new Guid("79d6307f-0a2d-434b-9369-14ca2a7b0964"), null, null, null, null, 7, "KILOAN SETRIKA/CUCI LIPAT" },
-                    { new Guid("9dcfba5f-8deb-48fb-8e7a-1e89972576f1"), null, null, null, null, 7, "KILOAN LENGKAP" },
-                    { new Guid("b8274b3f-b266-4f73-ab55-1697442c2334"), null, null, null, null, 7, "PAKET BULANAN LENGKAP" },
-                    { new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"), null, null, null, null, 3, "SPREI & ALAS KASUR" },
-                    { new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"), null, null, null, null, 3, "SEPATU DAN TAS" }
+                    { new Guid("04d9f89f-0e1a-4eea-b0a0-fbf956c39f6f"), null, null, null, null, 3, "KARPET/GORDEN" },
+                    { new Guid("280e3ddd-fbc4-4517-bbf8-46c2c2d06fd7"), null, null, null, null, 4, "PAKET BULANAN SETRIKA" },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), null, null, null, null, 3, "SATUAN" },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), null, null, null, null, 3, "BED COVER & SELIMUT" },
+                    { new Guid("515c63fc-9d49-4f50-bd59-baa5397a0829"), null, null, null, null, 3, "SPREI & ALAS KASUR" },
+                    { new Guid("5a432017-9a14-4fc7-a711-07fadb625cbc"), null, null, null, null, 3, "SEPATU DAN TAS" },
+                    { new Guid("89d1c832-b679-4e9d-87fe-36e1787f6aa2"), null, null, null, null, 7, "KILOAN LENGKAP" },
+                    { new Guid("a7e40294-dcc2-46f6-a093-0819f3901a6c"), null, null, null, null, 7, "PAKET BULANAN LENGKAP" },
+                    { new Guid("e9be97d0-ccd6-425a-b158-c0673c62c163"), null, null, null, null, 3, "BANTAL/BONEKA" },
+                    { new Guid("f7e5faa1-7cae-4c96-8878-31962d77826b"), null, null, null, null, 7, "KILOAN SETRIKA/CUCI LIPAT" }
                 });
 
             migrationBuilder.InsertData(
@@ -542,12 +542,12 @@ namespace WebAPI.Migrations
                 columns: new[] { "Id", "CategoryDisplayName", "CategoryName", "CategorySequence" },
                 values: new object[,]
                 {
-                    { new Guid("1be8a5b4-43e9-4f25-a737-3ba50ed86e2d"), "Purchase", "purchase", 50 },
-                    { new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"), "Master Data", "master-data", 30 },
-                    { new Guid("2b125185-f2d4-40be-81de-adbbf8932d6d"), "General Journal", "general-journal", 40 },
-                    { new Guid("5f88078c-c20c-4b3c-800e-a976c1140b02"), "Sales", "sales", 60 },
-                    { new Guid("620f0bfd-5891-4d19-9add-0645599726a3"), "Transaction", "transaction", 20 },
-                    { new Guid("7438f325-b9ba-45cb-b140-98ef709d1242"), "Dashboard", "dashboard", 10 }
+                    { new Guid("0590c04c-8151-472d-a232-cadbc903bf38"), "Sales", "sales", 60 },
+                    { new Guid("4bce05ab-064b-450e-a65b-34a0c67b52fd"), "Transaction", "transaction", 20 },
+                    { new Guid("6030865d-6d2e-4552-aa9e-4de69a8311c7"), "Purchase", "purchase", 50 },
+                    { new Guid("776bc8f8-98e4-4ecf-8595-1067fa478ecd"), "Master Data", "master-data", 30 },
+                    { new Guid("a478658e-7cf7-4b7f-9781-eb7662ec8531"), "Dashboard", "dashboard", 10 },
+                    { new Guid("e8314d9f-d217-451e-8e3c-1c36dd8e84e9"), "General Journal", "general-journal", 40 }
                 });
 
             migrationBuilder.InsertData(
@@ -555,19 +555,19 @@ namespace WebAPI.Migrations
                 columns: new[] { "Id", "MenuCategoryId", "MenuDisplayName", "MenuName", "MenuSequence" },
                 values: new object[,]
                 {
-                    { new Guid("2e6f34c4-8ab6-4b2b-a3dc-34fee9f5fca0"), new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"), "Menu Harga", "price-menu", 60 },
-                    { new Guid("60121a4c-2615-471f-a7b1-f3323dbd5a1b"), new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"), "Tipe Laundry", "laundry-service", 50 },
-                    { new Guid("6a18aaa5-0e3f-4bbb-8efe-1ca28dc358db"), new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"), "Pemasok", "supplier", 30 },
-                    { new Guid("798c3387-73d8-4d87-9166-6fee51467196"), new Guid("620f0bfd-5891-4d19-9add-0645599726a3"), "Tambah Pengeluaran", "expense", 20 },
-                    { new Guid("80eee7db-4076-4945-8868-ff5adfa7ce3b"), new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"), "Chart of Account", "chart-of-account", 10 },
-                    { new Guid("a4d2bbbb-b728-4ec4-98a1-0c9c13fc93ab"), new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"), "Persediaan", "inventory", 40 },
-                    { new Guid("a9664959-e933-4ba0-8a2a-dda86703bfc7"), new Guid("1be8a5b4-43e9-4f25-a737-3ba50ed86e2d"), "Pembelian", "purchase", 10 },
-                    { new Guid("ac5cc0b3-6c6e-4b59-a8a9-14bd57f37818"), new Guid("25c10c35-315e-4ee5-a896-8ec287d13ee0"), "Pelanggan", "customer", 20 },
-                    { new Guid("b3fb0010-bff0-4e76-8916-32855e7500ab"), new Guid("5f88078c-c20c-4b3c-800e-a976c1140b02"), "Penjualan", "sales", 10 },
-                    { new Guid("c210a099-6c14-4800-985b-606d9e28d436"), new Guid("620f0bfd-5891-4d19-9add-0645599726a3"), "Tambah Transaksi", "transaction", 10 },
-                    { new Guid("ca109359-d856-41ed-986c-36f03365b2c7"), new Guid("2b125185-f2d4-40be-81de-adbbf8932d6d"), "Jurnal Umum", "general-journal", 10 },
-                    { new Guid("ee558897-5562-4092-8e67-1dece1677335"), new Guid("7438f325-b9ba-45cb-b140-98ef709d1242"), "Dashboard", "dashboard", 10 },
-                    { new Guid("faac0c52-e69f-4ae3-a3b5-e0f4a437498b"), new Guid("5f88078c-c20c-4b3c-800e-a976c1140b02"), "Pembayaran Penjualan", "sales-payment", 20 }
+                    { new Guid("0c638caf-1e14-4b8c-8fe5-253c2b2d2bbd"), new Guid("776bc8f8-98e4-4ecf-8595-1067fa478ecd"), "Persediaan", "inventory", 40 },
+                    { new Guid("2eb65cdd-bc17-45e3-8dbc-052a4fe00a37"), new Guid("0590c04c-8151-472d-a232-cadbc903bf38"), "Penjualan", "sales", 10 },
+                    { new Guid("36795924-0dd0-43e8-a2cc-c630d109e2a6"), new Guid("776bc8f8-98e4-4ecf-8595-1067fa478ecd"), "Pemasok", "supplier", 30 },
+                    { new Guid("4511118f-3148-43f7-8d44-0eee17db4721"), new Guid("776bc8f8-98e4-4ecf-8595-1067fa478ecd"), "Menu Harga", "price-menu", 60 },
+                    { new Guid("469f4ec3-cc92-435c-84d4-8fabb8528ddf"), new Guid("776bc8f8-98e4-4ecf-8595-1067fa478ecd"), "Pelanggan", "customer", 20 },
+                    { new Guid("478bea66-ab80-4d53-a57e-57572c8b14a7"), new Guid("4bce05ab-064b-450e-a65b-34a0c67b52fd"), "Tambah Pengeluaran", "expense", 20 },
+                    { new Guid("4bc2d356-79a5-455c-931a-bd46c191c457"), new Guid("4bce05ab-064b-450e-a65b-34a0c67b52fd"), "Tambah Transaksi", "transaction", 10 },
+                    { new Guid("53db20f0-f99f-4eeb-9ff5-c606b50733ed"), new Guid("6030865d-6d2e-4552-aa9e-4de69a8311c7"), "Pembelian", "purchase", 10 },
+                    { new Guid("7cc563d8-d6a5-477f-aada-6aa5636bf92c"), new Guid("776bc8f8-98e4-4ecf-8595-1067fa478ecd"), "Chart of Account", "chart-of-account", 10 },
+                    { new Guid("9eefffa3-f067-4edf-8add-95fca3dd26bf"), new Guid("a478658e-7cf7-4b7f-9781-eb7662ec8531"), "Dashboard", "dashboard", 10 },
+                    { new Guid("adfb93a8-b182-4e53-9671-f395429ecdf6"), new Guid("e8314d9f-d217-451e-8e3c-1c36dd8e84e9"), "Jurnal Umum", "general-journal", 10 },
+                    { new Guid("ba3c692e-c612-44c0-aebb-a477bc2091e0"), new Guid("776bc8f8-98e4-4ecf-8595-1067fa478ecd"), "Tipe Laundry", "laundry-service", 50 },
+                    { new Guid("d152a663-02e5-4dc5-a392-d06b0e2dada1"), new Guid("0590c04c-8151-472d-a232-cadbc903bf38"), "Pembayaran Penjualan", "sales-payment", 20 }
                 });
 
             migrationBuilder.InsertData(
@@ -575,59 +575,59 @@ namespace WebAPI.Migrations
                 columns: new[] { "LaundryServiceId", "PriceMenuId", "Created", "CreatedBy", "DeliveryOption", "LastModified", "LastModifiedBy", "Name", "Price", "PricingOption", "ProcessingTime", "TimeUnit" },
                 values: new object[,]
                 {
-                    { new Guid("1bc86c21-a291-464a-9f1b-cf1242593d62"), new Guid("4bfbb1f2-bab1-48e1-8004-fe711d3c2db0"), null, null, 0, null, null, "100 Kgs", 475000m, 8, 0, 0 },
-                    { new Guid("1bc86c21-a291-464a-9f1b-cf1242593d62"), new Guid("90cb7a61-7b4b-4c11-8de9-bdceaaeb67bf"), null, null, 0, null, null, "50 Kgs", 240000m, 8, 0, 0 },
-                    { new Guid("1bc86c21-a291-464a-9f1b-cf1242593d62"), new Guid("a301b3cf-0501-4be8-a3d7-799324a8dcad"), null, null, 0, null, null, "25 Kgs", 120000m, 8, 0, 0 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("21e00ace-3d3d-4d7d-9fc0-fada6f52c3c6"), null, null, 1, null, null, "Bed Cover King", 25000m, 1, 3, 2 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("26b20d9e-d00b-412f-bd13-8e7d58336ec0"), null, null, 4, null, null, "Bed Cover King Set", 76000m, 4, 6, 1 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("3dabc956-38e5-4dfe-ab06-20ba116b5699"), null, null, 4, null, null, "Bed Cover Queen", 40000m, 1, 6, 1 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("5050f5fe-8ade-4a37-83dc-aee897fa3ba1"), null, null, 4, null, null, "Bed Cover Single Set", 54000m, 4, 6, 1 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("561db35f-040d-4b3d-a12b-3a71c8ed78d1"), null, null, 4, null, null, "Selimut", 30000m, 1, 6, 1 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("5823c7a2-6f8d-496b-8986-67a602d007c4"), null, null, 1, null, null, "Selimut", 15000m, 1, 3, 2 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("622051d4-33cb-4846-a243-04de8261acf1"), null, null, 1, null, null, "Bed Cover Single Set", 27000m, 4, 3, 2 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("6b9465d1-2dcf-4ae4-91fb-255ab18be15b"), null, null, 1, null, null, "Selimut Tipis", 10000m, 1, 3, 2 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("90793a83-075e-4c24-a604-978d52c23b73"), null, null, 1, null, null, "Bed Cover Queen Set", 35000m, 4, 3, 2 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("952c1f81-a383-4459-828f-07fdccec5b5c"), null, null, 4, null, null, "Bed Cover Queen Set", 70000m, 4, 6, 1 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("b1164962-4589-4ab4-acf9-ef5f57c4fbe1"), null, null, 1, null, null, "Bed Cover King Set", 38000m, 4, 3, 2 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("c2cfa26c-2649-40ee-8ff4-e91e558e3cbd"), null, null, 1, null, null, "Bed Cover Single", 15000m, 1, 3, 2 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("c5b7cfe8-62dd-4b12-877d-7f2e7bd874bf"), null, null, 4, null, null, "Bed Cover Single", 30000m, 1, 6, 1 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("c6b6f8b1-f615-4a23-947d-cee89666bfca"), null, null, 1, null, null, "Bed Cover Queen", 20000m, 1, 3, 2 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("df8d34f4-a955-4b2a-8a43-e7037554106f"), null, null, 4, null, null, "Selimut Tipis", 20000m, 1, 6, 1 },
-                    { new Guid("3170542f-2798-4e04-a611-513030deeb60"), new Guid("ff69965c-46b5-4e7c-87cf-1ce32d7d3ed4"), null, null, 4, null, null, "Bed Cover King", 50000m, 1, 6, 1 },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), new Guid("06282237-afa5-494d-a481-eb8918a39efe"), null, null, 1, null, null, "Bawahan", 10000m, 1, 2, 2 },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), new Guid("103df9db-ced7-4890-b1ef-edefcce52419"), null, null, 1, null, null, "Handuk Besar", 7000m, 1, 2, 2 },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), new Guid("227c686a-cf81-46b8-9674-a68a8192d819"), null, null, 1, null, null, "Atasan", 10000m, 1, 2, 2 },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), new Guid("352fa960-6053-4aca-961a-94d870954527"), null, null, 1, null, null, "Blazer Set", 25000m, 1, 2, 2 },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), new Guid("817659dc-6674-4b77-95a3-10416611d935"), null, null, 1, null, null, "Blazer", 15000m, 1, 2, 2 },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), new Guid("9c61ed8d-45b5-4691-a7e3-0592c5f9cad3"), null, null, 1, null, null, "Jaket/Sweater", 15000m, 1, 2, 2 },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), new Guid("ab8c2990-7887-4712-8116-5351904f884e"), null, null, 1, null, null, "Dress Pendek", 15000m, 1, 2, 2 },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), new Guid("adf049ee-f4ce-41ce-ae3d-185acfadfb87"), null, null, 1, null, null, "Dress Panjang", 15000m, 1, 2, 2 },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), new Guid("f0c22a66-79ff-4be3-bf79-436bf2fa365b"), null, null, 1, null, null, "Handuk Sedang", 6000m, 1, 2, 2 },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), new Guid("f4691731-9614-4ab4-9b86-425b3e7732c1"), null, null, 1, null, null, "Jas", 20000m, 1, 2, 2 },
-                    { new Guid("5855f493-a1b8-423a-8160-db046a751d3c"), new Guid("f877003c-362c-4f6d-b185-9a0327c65077"), null, null, 1, null, null, "Jas Set", 30000m, 1, 2, 2 },
-                    { new Guid("79d6307f-0a2d-434b-9369-14ca2a7b0964"), new Guid("336e869a-22b2-4916-9fa3-62c35a7053ff"), null, null, 2, null, null, "One Day", 7000m, 2, 1, 2 },
-                    { new Guid("79d6307f-0a2d-434b-9369-14ca2a7b0964"), new Guid("6531c6f0-d57c-4545-a970-50d19dc1d6c5"), null, null, 1, null, null, "Reguler", 5000m, 2, 2, 2 },
-                    { new Guid("79d6307f-0a2d-434b-9369-14ca2a7b0964"), new Guid("88df50cd-64da-4390-8931-0c68eea0b0ce"), null, null, 4, null, null, "Express", 9000m, 2, 6, 1 },
-                    { new Guid("9dcfba5f-8deb-48fb-8e7a-1e89972576f1"), new Guid("77055c24-49ff-408a-bff3-cd779550299b"), null, null, 4, null, null, "Express", 10000m, 2, 6, 1 },
-                    { new Guid("9dcfba5f-8deb-48fb-8e7a-1e89972576f1"), new Guid("77ccb963-7d8e-4383-abd9-f6f1c65046fc"), null, null, 2, null, null, "One Day", 8000m, 2, 1, 2 },
-                    { new Guid("9dcfba5f-8deb-48fb-8e7a-1e89972576f1"), new Guid("7b791afa-bc83-490b-8a7a-21ffa603ca7b"), null, null, 1, null, null, "Reguler", 6000m, 2, 2, 2 },
-                    { new Guid("b8274b3f-b266-4f73-ab55-1697442c2334"), new Guid("690720fe-d787-45f1-8d41-6fabe1ba0114"), null, null, 0, null, null, "100 Kgs", 550000m, 8, 0, 0 },
-                    { new Guid("b8274b3f-b266-4f73-ab55-1697442c2334"), new Guid("93415812-109e-4e6b-a814-2384f48b8ea6"), null, null, 0, null, null, "25 Kgs", 140000m, 8, 0, 0 },
-                    { new Guid("b8274b3f-b266-4f73-ab55-1697442c2334"), new Guid("f5d7dde6-2b27-4a35-ae14-60cced8eb360"), null, null, 0, null, null, "50 Kgs", 275000m, 8, 0, 0 },
-                    { new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"), new Guid("08f1bea0-3a28-448b-96ff-22276e9236a9"), null, null, 1, null, null, "Sprei King Set", 20000m, 4, 3, 2 },
-                    { new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"), new Guid("110572e4-5446-4464-adb8-00bd33e8f50d"), null, null, 1, null, null, "Sprei Single", 10000m, 1, 3, 2 },
-                    { new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"), new Guid("1eb8c6cd-a15a-4763-a33c-053afcabc955"), null, null, 1, null, null, "Alas Kasur Single", 15000m, 1, 3, 2 },
-                    { new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"), new Guid("32f1fead-42d6-431a-8438-520e7874362e"), null, null, 1, null, null, "Sprei Queen", 15000m, 1, 3, 2 },
-                    { new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"), new Guid("3e02d27d-1b93-4d81-affd-a30bd3087f4e"), null, null, 1, null, null, "Alas Kasur King", 25000m, 1, 3, 2 },
-                    { new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"), new Guid("5417a310-57bb-40c4-9c35-0d567979824f"), null, null, 1, null, null, "Sprei Quen Set", 20000m, 4, 3, 2 },
-                    { new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"), new Guid("72f41098-5f5b-40c2-b6c0-54ad4447630f"), null, null, 1, null, null, "Sprei Single Set", 15000m, 4, 3, 2 },
-                    { new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"), new Guid("7ff3bd7c-6e24-4e2a-ba0a-df5f8204a066"), null, null, 1, null, null, "Alas Kasur Queen", 20000m, 1, 3, 2 },
-                    { new Guid("bf3bbb9c-6a89-40f4-a0a7-27eb6b44e2f4"), new Guid("e8622568-908b-4b42-9fb0-52663a3b4ef3"), null, null, 1, null, null, "Sprei King", 15000m, 1, 3, 2 },
-                    { new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"), new Guid("14952d2e-9050-4317-bc01-fc7f4b4e8582"), null, null, 1, null, null, "Tas Mini", 10000m, 1, 2, 2 },
-                    { new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"), new Guid("37b22bed-6c1e-4f86-bb2d-b98d51af44ab"), null, null, 1, null, null, "Tas Besar", 30000m, 1, 2, 2 },
-                    { new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"), new Guid("65cf5865-626b-40f2-8965-fb39e2bc3aa5"), null, null, 1, null, null, "Tas Kecil", 15000m, 1, 2, 2 },
-                    { new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"), new Guid("80531b22-8b1a-4686-8cc1-8847b5f4727f"), null, null, 1, null, null, "Tas Sedang", 25000m, 1, 2, 2 },
-                    { new Guid("e9694b85-29ec-4e0f-8a5b-6c9aeadf43b8"), new Guid("f5425152-0634-457e-94f5-910b4a27a5a3"), null, null, 1, null, null, "Sepatu", 25000m, 1, 2, 2 }
+                    { new Guid("280e3ddd-fbc4-4517-bbf8-46c2c2d06fd7"), new Guid("1f93a90c-1aee-43de-89c7-37f70ceb3aab"), null, null, 0, null, null, "100 Kgs", 475000m, 8, 0, 0 },
+                    { new Guid("280e3ddd-fbc4-4517-bbf8-46c2c2d06fd7"), new Guid("4481234d-f123-471d-9015-df165d7427bf"), null, null, 0, null, null, "50 Kgs", 240000m, 8, 0, 0 },
+                    { new Guid("280e3ddd-fbc4-4517-bbf8-46c2c2d06fd7"), new Guid("e6046a26-3b66-4f21-a11d-48e17ffbbdf7"), null, null, 0, null, null, "25 Kgs", 120000m, 8, 0, 0 },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), new Guid("31e60924-f23e-4958-b69e-62062602db02"), null, null, 1, null, null, "Dress Panjang", 15000m, 1, 2, 2 },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), new Guid("5bb35bdf-fd5b-4754-ad74-fb89b346fee5"), null, null, 1, null, null, "Blazer Set", 25000m, 1, 2, 2 },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), new Guid("6a56a6c8-49f8-4c95-b571-3acbfc0e6b69"), null, null, 1, null, null, "Dress Pendek", 15000m, 1, 2, 2 },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), new Guid("6f9d6bdb-d8d9-4821-b157-6f6583593e01"), null, null, 1, null, null, "Handuk Sedang", 6000m, 1, 2, 2 },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), new Guid("941347d1-80f1-4d88-af6f-08731185269b"), null, null, 1, null, null, "Handuk Besar", 7000m, 1, 2, 2 },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), new Guid("a5853c80-1365-400a-91e5-a4edd5b3827b"), null, null, 1, null, null, "Blazer", 15000m, 1, 2, 2 },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), new Guid("ae76c037-e417-4d0a-80fe-cc308a306aa7"), null, null, 1, null, null, "Jas Set", 30000m, 1, 2, 2 },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), new Guid("c6120d9b-7006-42df-a28e-6e3bb9f3f849"), null, null, 1, null, null, "Jas", 20000m, 1, 2, 2 },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), new Guid("d4683705-2607-4ae1-ad32-359f1d043a31"), null, null, 1, null, null, "Bawahan", 10000m, 1, 2, 2 },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), new Guid("d949883e-dd9e-4177-b16d-74595edfd1cd"), null, null, 1, null, null, "Jaket/Sweater", 15000m, 1, 2, 2 },
+                    { new Guid("284cac47-3b72-4cd9-8280-6a6fb92eedda"), new Guid("f75615f9-f200-4d30-a6f5-ab8dbcedf788"), null, null, 1, null, null, "Atasan", 10000m, 1, 2, 2 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("0d71d3a8-9d80-4a98-ad1b-03bcd68ab874"), null, null, 1, null, null, "Bed Cover King", 25000m, 1, 3, 2 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("0f3284dc-e566-41d3-a981-0af4d1865a66"), null, null, 4, null, null, "Bed Cover King Set", 76000m, 4, 6, 1 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("15b8b87c-c035-4022-9fd3-ebde50ef6e00"), null, null, 1, null, null, "Bed Cover Single Set", 27000m, 4, 3, 2 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("1efd47c7-ac74-4bb6-ad28-a99c391e872d"), null, null, 4, null, null, "Bed Cover Single", 30000m, 1, 6, 1 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("22ab0f8b-2fb1-4c00-9e7a-9ef26d620e9f"), null, null, 4, null, null, "Bed Cover Single Set", 54000m, 4, 6, 1 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("271aed3b-08bd-4bfb-9ba7-7a127132f40e"), null, null, 4, null, null, "Bed Cover Queen", 40000m, 1, 6, 1 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("2df7163c-2152-409e-903e-daf7a1851931"), null, null, 1, null, null, "Selimut Tipis", 10000m, 1, 3, 2 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("41374d56-7c98-44f1-8aaa-5cd560c53fa3"), null, null, 4, null, null, "Bed Cover King", 50000m, 1, 6, 1 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("49eaac18-5dc7-47af-9833-e5bf564e8329"), null, null, 4, null, null, "Selimut Tipis", 20000m, 1, 6, 1 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("704a120f-157a-45e4-8551-3a942c62bc40"), null, null, 1, null, null, "Bed Cover Single", 15000m, 1, 3, 2 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("846d2fe3-438a-4539-802a-6b8f0fbc000d"), null, null, 4, null, null, "Bed Cover Queen Set", 70000m, 4, 6, 1 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("a0ae3e41-e1f2-4892-9278-1c9c0971928f"), null, null, 1, null, null, "Bed Cover Queen Set", 35000m, 4, 3, 2 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("cc945e9b-70ce-46a0-bfb2-354e6af2d6a7"), null, null, 4, null, null, "Selimut", 30000m, 1, 6, 1 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("d3f83f77-51be-435c-8a83-fa5451b0dc27"), null, null, 1, null, null, "Bed Cover Queen", 20000m, 1, 3, 2 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("d4b4ed62-3165-41fd-a920-67d653f78283"), null, null, 1, null, null, "Selimut", 15000m, 1, 3, 2 },
+                    { new Guid("35b4a114-f594-41be-873a-0199950a7bf0"), new Guid("d9a17633-28b3-40e8-9a43-b8d5a1a52980"), null, null, 1, null, null, "Bed Cover King Set", 38000m, 4, 3, 2 },
+                    { new Guid("515c63fc-9d49-4f50-bd59-baa5397a0829"), new Guid("08684242-39e7-4783-9883-da6b1bea6e9d"), null, null, 1, null, null, "Alas Kasur Single", 15000m, 1, 3, 2 },
+                    { new Guid("515c63fc-9d49-4f50-bd59-baa5397a0829"), new Guid("543f7e32-707a-4814-b1bf-e49603c8d97f"), null, null, 1, null, null, "Alas Kasur Queen", 20000m, 1, 3, 2 },
+                    { new Guid("515c63fc-9d49-4f50-bd59-baa5397a0829"), new Guid("9bf4aa8f-8c44-488b-9045-5e18928d3e9b"), null, null, 1, null, null, "Sprei Single Set", 15000m, 4, 3, 2 },
+                    { new Guid("515c63fc-9d49-4f50-bd59-baa5397a0829"), new Guid("a365cb46-40d0-4c46-9572-d7c3946d4948"), null, null, 1, null, null, "Sprei Single", 10000m, 1, 3, 2 },
+                    { new Guid("515c63fc-9d49-4f50-bd59-baa5397a0829"), new Guid("c6fd370e-ecbd-46cc-8b76-1a69987d273b"), null, null, 1, null, null, "Sprei Quen Set", 20000m, 4, 3, 2 },
+                    { new Guid("515c63fc-9d49-4f50-bd59-baa5397a0829"), new Guid("d1beca33-b4e4-48cb-ad40-cfd9ee64fb32"), null, null, 1, null, null, "Sprei King Set", 20000m, 4, 3, 2 },
+                    { new Guid("515c63fc-9d49-4f50-bd59-baa5397a0829"), new Guid("daecf311-1db8-4d73-b372-e586079363dd"), null, null, 1, null, null, "Sprei Queen", 15000m, 1, 3, 2 },
+                    { new Guid("515c63fc-9d49-4f50-bd59-baa5397a0829"), new Guid("dbb8bac3-e0cc-4dc1-930e-a01cd3763013"), null, null, 1, null, null, "Sprei King", 15000m, 1, 3, 2 },
+                    { new Guid("515c63fc-9d49-4f50-bd59-baa5397a0829"), new Guid("eb7308dc-6ae3-43b8-bc6f-7f26d4c82bf7"), null, null, 1, null, null, "Alas Kasur King", 25000m, 1, 3, 2 },
+                    { new Guid("5a432017-9a14-4fc7-a711-07fadb625cbc"), new Guid("855be10a-2c23-4249-8660-f0b16b16c7b9"), null, null, 1, null, null, "Sepatu", 25000m, 1, 2, 2 },
+                    { new Guid("5a432017-9a14-4fc7-a711-07fadb625cbc"), new Guid("c71fb57c-7dd0-4d4f-8a3f-5e094921f978"), null, null, 1, null, null, "Tas Sedang", 25000m, 1, 2, 2 },
+                    { new Guid("5a432017-9a14-4fc7-a711-07fadb625cbc"), new Guid("cd06fac7-869c-42b5-b423-80401f2626c6"), null, null, 1, null, null, "Tas Besar", 30000m, 1, 2, 2 },
+                    { new Guid("5a432017-9a14-4fc7-a711-07fadb625cbc"), new Guid("d424edac-90fb-4791-a3c5-3c994b8bc600"), null, null, 1, null, null, "Tas Mini", 10000m, 1, 2, 2 },
+                    { new Guid("5a432017-9a14-4fc7-a711-07fadb625cbc"), new Guid("ff87e2c7-aced-4b16-82c8-c32ab733a78c"), null, null, 1, null, null, "Tas Kecil", 15000m, 1, 2, 2 },
+                    { new Guid("89d1c832-b679-4e9d-87fe-36e1787f6aa2"), new Guid("07bf165f-5500-4fba-84f6-24fb76c390fc"), null, null, 4, null, null, "Express", 10000m, 2, 6, 1 },
+                    { new Guid("89d1c832-b679-4e9d-87fe-36e1787f6aa2"), new Guid("9dee9011-2587-4072-b518-13bdd1a48977"), null, null, 1, null, null, "Reguler", 6000m, 2, 2, 2 },
+                    { new Guid("89d1c832-b679-4e9d-87fe-36e1787f6aa2"), new Guid("db1271dc-b3aa-4744-981d-53972af603a6"), null, null, 2, null, null, "One Day", 8000m, 2, 1, 2 },
+                    { new Guid("a7e40294-dcc2-46f6-a093-0819f3901a6c"), new Guid("7e057a1c-a792-4511-9b9c-a7204c7b76d5"), null, null, 0, null, null, "100 Kgs", 550000m, 8, 0, 0 },
+                    { new Guid("a7e40294-dcc2-46f6-a093-0819f3901a6c"), new Guid("8b4f8ada-aef1-4e7a-a786-d48de73afb64"), null, null, 0, null, null, "25 Kgs", 140000m, 8, 0, 0 },
+                    { new Guid("a7e40294-dcc2-46f6-a093-0819f3901a6c"), new Guid("d86e17a5-ed36-4f8a-b1a3-eb884b4ec579"), null, null, 0, null, null, "50 Kgs", 275000m, 8, 0, 0 },
+                    { new Guid("f7e5faa1-7cae-4c96-8878-31962d77826b"), new Guid("7a0db096-9368-4fe5-826c-91173a1f4fc2"), null, null, 4, null, null, "Express", 9000m, 2, 6, 1 },
+                    { new Guid("f7e5faa1-7cae-4c96-8878-31962d77826b"), new Guid("af2edb70-d33f-4444-b21c-81feae35ef70"), null, null, 2, null, null, "One Day", 7000m, 2, 1, 2 },
+                    { new Guid("f7e5faa1-7cae-4c96-8878-31962d77826b"), new Guid("ce8592e8-648e-468d-9729-ebab5680032b"), null, null, 1, null, null, "Reguler", 5000m, 2, 2, 2 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -659,21 +659,21 @@ namespace WebAPI.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_general_journal_detail_ChartOfAccountId",
-                table: "general_journal_detail",
-                column: "ChartOfAccountId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_general_journal_header_TransactionNo",
-                table: "general_journal_header",
-                column: "TransactionNo",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_inventory_ItemNo",
                 table: "inventory",
                 column: "ItemNo",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_journal_entry_TransactionNo",
+                table: "journal_entry",
+                column: "TransactionNo",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_journal_item_ChartOfAccountId",
+                table: "journal_item",
+                column: "ChartOfAccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_laundry_service_Name",
@@ -784,7 +784,7 @@ namespace WebAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "general_journal_detail");
+                name: "journal_item");
 
             migrationBuilder.DropTable(
                 name: "purchase_detail");
@@ -805,7 +805,7 @@ namespace WebAPI.Migrations
                 name: "chart_of_account");
 
             migrationBuilder.DropTable(
-                name: "general_journal_header");
+                name: "journal_entry");
 
             migrationBuilder.DropTable(
                 name: "inventory");

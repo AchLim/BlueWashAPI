@@ -7,70 +7,70 @@ using WebAPI.Models;
 
 namespace WebAPI.DAL
 {
-    public sealed class GeneralJournalRepository : IGeneralJournalRepository
+    public sealed class JournalEntryRepository : IJournalEntryRepository
     {
         private readonly ApplicationContext _context;
 
-        public GeneralJournalRepository(ApplicationContext context)
+        public JournalEntryRepository(ApplicationContext context)
         {
             _context = context;
         }
 
 
-        public async Task<IEnumerable<GeneralJournalHeader>> GetAllGeneralJournalHeaders()
+        public async Task<IEnumerable<JournalEntry>> GetAllJournalEntries()
         {
-            IEnumerable<GeneralJournalHeader> generalJournalHeaders = Enumerable.Empty<GeneralJournalHeader>();
+            IEnumerable<JournalEntry> journalEntries = Enumerable.Empty<JournalEntry>();
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    generalJournalHeaders = await _context.GeneralJournalHeaders
-                                                            .Include(header => header.GeneralJournalDetails!)
-                                                            .ThenInclude(detail => detail.ChartOfAccount)
+                    journalEntries = await _context.JournalEntries
+                                                            .Include(entry => entry.JournalItems!)
+                                                            .ThenInclude(items => items.ChartOfAccount)
                                                             .ToListAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data header jurnal umum.", ex);
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data jurnal.", ex);
                 }
             }
 
-            return generalJournalHeaders;
+            return journalEntries;
         }
 
-        public async Task<GeneralJournalHeader?> GetGeneralJournalHeaderById(Guid id)
+        public async Task<JournalEntry?> GetJournalEntryById(Guid id)
         {
-            GeneralJournalHeader? generalJournalHeader = null;
+            JournalEntry? journalEntry = null;
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    generalJournalHeader = await _context.GeneralJournalHeaders
-                                                            .Include(header => header.GeneralJournalDetails!)
+                    journalEntry = await _context.JournalEntries
+                                                            .Include(entry => entry.JournalItems!)
                                                             .ThenInclude(detail => detail.ChartOfAccount)
                                                             .FirstOrDefaultAsync(header => header.Id == id);
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException($"Terjadi kesalahan dalam pengambilan data header jurnal umum dengan id: {id}", ex);
+                    throw new DatabaseReadException($"Terjadi kesalahan dalam pengambilan data jurnal dengan id: {id}", ex);
                 }
             }
 
-            return generalJournalHeader;
+            return journalEntry;
         }
 
-        public async Task InsertGeneralJournalHeader(GeneralJournalHeader generalJournalHeader)
+        public async Task InsertJournalEntry(JournalEntry journalEntry)
         {
-            if (generalJournalHeader.TransactionNo.Trim() == string.Empty)
+            if (journalEntry.TransactionNo.Trim() == string.Empty)
                 throw new DatabaseInsertException("Nomor Transaksi tidak boleh kosong!", null);
 
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    await _context.GeneralJournalHeaders.AddAsync(generalJournalHeader);
+                    await _context.JournalEntries.AddAsync(journalEntry);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
@@ -78,27 +78,27 @@ namespace WebAPI.DAL
                 {
                     await transaction.RollbackAsync();
                     throw new DatabaseUniqueConstraintException($@"
-                        Terjadi kesalahan dalam memperbarui data header jurnal umum dengan nomor transaksi: {generalJournalHeader.TransactionNo}.
-                        Nomor transaksi '{generalJournalHeader.TransactionNo}' sudah digunakan. Pastikan anda menggunakan nomor transaksi yang unik.
+                        Terjadi kesalahan dalam memperbarui data jurnal dengan nomor transaksi: {journalEntry.TransactionNo}.
+                        Nomor transaksi '{journalEntry.TransactionNo}' sudah digunakan. Pastikan anda menggunakan nomor transaksi yang unik.
                     ", ex);
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseInsertException($"Terjadi kesalahan dalam menambahkan header jurnal umum dengan nomor transaksi: {generalJournalHeader.TransactionNo}", ex);
+                    throw new DatabaseInsertException($"Terjadi kesalahan dalam menambahkan jurnal dengan nomor transaksi: {journalEntry.TransactionNo}", ex);
                 }
             }
         }
-        public async Task UpdateGeneralJournalHeader(GeneralJournalHeader generalJournalHeader)
+        public async Task UpdateJournalEntry(JournalEntry journalEntry)
         {
-            if (generalJournalHeader.TransactionNo.Trim() == string.Empty)
+            if (journalEntry.TransactionNo.Trim() == string.Empty)
                 throw new DatabaseInsertException("Nomor Transaksi tidak boleh kosong!", null);
 
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    _context.GeneralJournalHeaders.Update(generalJournalHeader);
+                    _context.JournalEntries.Update(journalEntry);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
@@ -106,45 +106,47 @@ namespace WebAPI.DAL
                 {
                     await transaction.RollbackAsync();
                     throw new DatabaseUniqueConstraintException($@"
-                        Terjadi kesalahan dalam memperbarui data header jurnal umum dengan nomor transaksi: {generalJournalHeader.TransactionNo}.
-                        Nomor transaksi '{generalJournalHeader.TransactionNo}' sudah digunakan. Pastikan anda menggunakan nomor transaksi yang unik.
+                        Terjadi kesalahan dalam memperbarui data jurnal dengan nomor transaksi: {journalEntry.TransactionNo}.
+                        Nomor transaksi '{journalEntry.TransactionNo}' sudah digunakan. Pastikan anda menggunakan nomor transaksi yang unik.
                     ", ex);
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseUpdateException($"Terjadi kesalahan dalam memperbarui data header jurnal umum dengan nomor transaksi: {generalJournalHeader.TransactionNo}", ex);
+                    throw new DatabaseUpdateException($"Terjadi kesalahan dalam memperbarui data jurnal dengan nomor transaksi: {journalEntry.TransactionNo}", ex);
                 }
             }
         }
-        public async Task DeleteGeneralJournalHeader(GeneralJournalHeader generalJournalHeader)
+        public async Task DeleteJournalEntry(JournalEntry journalEntry)
         {
 
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    _context.GeneralJournalHeaders.Remove(generalJournalHeader);
+                    _context.JournalEntries.Remove(journalEntry);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseDeleteException($"Terjadi kesalahan dalam menghapus data header jurnal umum dengan nomor transaksi: {generalJournalHeader.TransactionNo}", ex);
+                    throw new DatabaseDeleteException($"Terjadi kesalahan dalam menghapus data jurnal dengan nomor transaksi: {journalEntry.TransactionNo}", ex);
                 }
             }
         }
 
-        public async Task<IEnumerable<GeneralJournalContainer>> GetGeneralJournalData()
+
+
+        public async Task<IEnumerable<JournalEntryContainer>> GetJournalEntryData()
         {
-            IEnumerable<GeneralJournalContainer> generalJournalData = Enumerable.Empty<GeneralJournalContainer>();
+            IEnumerable<JournalEntryContainer> generalJournalData = Enumerable.Empty<JournalEntryContainer>();
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
                     // EF bug. Need to convert to AsEnumerable for first query.
-                    generalJournalData = (await GetGeneralJournalQuery().ToListAsync())
+                    generalJournalData = (await GetJournalEntryQuery().ToListAsync())
                                         .Concat(GetPurchaseDebitQuery())
                                         .Concat(GetPurchaseCreditQuery())
                                         .Concat(GetSalesDebitQuery())
@@ -154,27 +156,27 @@ namespace WebAPI.DAL
                 catch (System.Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data jurnal umum", ex);
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data jurnal", ex);
                 }
             }
 
             return generalJournalData;
         }
 
-        public IQueryable<GeneralJournalContainer> GetGeneralJournalQuery()
+        public IQueryable<JournalEntryContainer> GetJournalEntryQuery()
         {
-            return _context.GeneralJournalHeaders.GroupJoin(_context.GeneralJournalDetails.Join(_context.ChartOfAccounts,
-                                                                                                                   detail => detail.ChartOfAccountId,
-                                                                                                                   coa => coa.Id,
-                                                                                                                   (detail, coa) => new
-                                                                                                                   {
-                                                                                                                       GeneralJournalHeaderId = detail.GeneralJournalHeaderId,
-                                                                                                                       AccountNo = coa.AccountNo,
-                                                                                                                       Debit = detail.Debit,
-                                                                                                                       Credit = detail.Credit,
-                                                                                                                   }),
+            return _context.JournalEntries.GroupJoin(_context.JournalItems.Join(_context.ChartOfAccounts,
+                                                                                item => item.ChartOfAccountId,
+                                                                                coa => coa.Id,
+                                                                                (item, coa) => new
+                                                                                {
+                                                                                    JournalEntryId = item.JournalEntryId,
+                                                                                    AccountNo = coa.AccountNo,
+                                                                                    Debit = item.Debit,
+                                                                                    Credit = item.Credit,
+                                                                                }),
                                                                               header => header.Id,
-                                                                              detail => detail.GeneralJournalHeaderId,
+                                                                              item => item.JournalEntryId,
                                                                               (header, details) => new
                                                                               {
                                                                                   TransactionNo = header.TransactionNo,
@@ -199,7 +201,7 @@ namespace WebAPI.DAL
                                                                         result.AccountNo,
                                                                         result.Description
                                                                     })
-                                                                    .Select(group => new GeneralJournalContainer
+                                                                    .Select(group => new JournalEntryContainer
                                                                     {
                                                                         TransactionNo = group.Key.TransactionNo,
                                                                         TransactionDate = group.Key.TransactionDate,
@@ -210,7 +212,7 @@ namespace WebAPI.DAL
                                                                     });
         }
 
-        public IQueryable<GeneralJournalContainer> GetPurchaseDebitQuery()
+        public IQueryable<JournalEntryContainer> GetPurchaseDebitQuery()
         {
             return _context.PurchaseHeaders.GroupJoin(_context.PurchaseDetails,
                                                                               header => header.Id,
@@ -239,7 +241,7 @@ namespace WebAPI.DAL
                                                                         result.AccountNo,
                                                                         result.Description,
                                                                     })
-                                                                    .Select(group => new GeneralJournalContainer
+                                                                    .Select(group => new JournalEntryContainer
                                                                     {
                                                                         TransactionNo = group.Key.TransactionNo,
                                                                         TransactionDate = group.Key.TransactionDate,
@@ -250,7 +252,7 @@ namespace WebAPI.DAL
                                                                     });
         }
 
-        public IQueryable<GeneralJournalContainer> GetPurchaseCreditQuery()
+        public IQueryable<JournalEntryContainer> GetPurchaseCreditQuery()
         {
             return _context.PurchaseHeaders.GroupJoin(_context.PurchaseDetails,
                                                                               header => header.Id,
@@ -279,7 +281,7 @@ namespace WebAPI.DAL
                                                                         result.AccountNo,
                                                                         result.Description,
                                                                     })
-                                                                    .Select(group => new GeneralJournalContainer
+                                                                    .Select(group => new JournalEntryContainer
                                                                     {
                                                                         TransactionNo = group.Key.TransactionNo,
                                                                         TransactionDate = group.Key.TransactionDate,
@@ -290,7 +292,7 @@ namespace WebAPI.DAL
                                                                     });
         }
 
-        public IQueryable<GeneralJournalContainer> GetSalesDebitQuery()
+        public IQueryable<JournalEntryContainer> GetSalesDebitQuery()
         {
 
             return _context.SalesHeaders.GroupJoin(_context.SalesDetails,
@@ -320,7 +322,7 @@ namespace WebAPI.DAL
                                                        result.AccountNo,
                                                        result.Description,
                                                    })
-                                                   .Select(group => new GeneralJournalContainer
+                                                   .Select(group => new JournalEntryContainer
                                                    {
                                                        TransactionNo = group.Key.TransactionNo,
                                                        TransactionDate = group.Key.TransactionDate,
@@ -332,7 +334,7 @@ namespace WebAPI.DAL
 
         }
 
-        public IQueryable<GeneralJournalContainer> GetSalesCreditQuery()
+        public IQueryable<JournalEntryContainer> GetSalesCreditQuery()
         {
             return _context.SalesHeaders.GroupJoin(_context.SalesDetails,
                                                                   header => header.Id,
@@ -361,7 +363,7 @@ namespace WebAPI.DAL
                                                            result.AccountNo,
                                                            result.Description,
                                                        })
-                                                       .Select(group => new GeneralJournalContainer
+                                                       .Select(group => new JournalEntryContainer
                                                        {
                                                            TransactionNo = group.Key.TransactionNo,
                                                            TransactionDate = group.Key.TransactionDate,
@@ -374,7 +376,7 @@ namespace WebAPI.DAL
 
     }
 
-    public class GeneralJournalContainer
+    public class JournalEntryContainer
     {
         public string TransactionNo { get; set; } = default!;
         public DateOnly TransactionDate { get; set; }

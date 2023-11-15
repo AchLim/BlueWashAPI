@@ -53,23 +53,29 @@ namespace WebAPI.Utility
             chartOfAccount.AccountName = dto.AccountName;
         }
 
-        public static void PassData(this GeneralJournalHeaderUpdateDto dto, ref GeneralJournalHeader generalJournalHeader)
+        public static void PassData(this JournalEntryUpdateDto dto, ref JournalEntry generalJournalHeader)
         {
             generalJournalHeader.TransactionNo = dto.TransactionNo;
-            generalJournalHeader.TransactionDate = DateOnly.FromDateTime(dto.TransactionDate);
+            generalJournalHeader.TransactionDate = dto.TransactionDate;
             generalJournalHeader.Description = dto.Description;
 
-            List<GeneralJournalDetail> details = new();
+            List<JournalItem> journalItems = new();
 
-            if (dto.GeneralJournalDetails.IsNotEmpty())
+            if (dto.JournalItems.IsNotEmpty())
             {
-                foreach (var detail in dto.GeneralJournalDetails!)
+                foreach (var detail in dto.JournalItems!)
                 {
-                    details.Add(new GeneralJournalDetail { ChartOfAccountId = detail.ChartOfAccountId, Debit = detail.Debit, Credit = detail.Credit });
+                    journalItems.Add(new JournalItem
+                    { 
+                        JournalItemId = detail.JournalItemId,
+                        ChartOfAccountId = detail.ChartOfAccountId,
+                        Debit = detail.Debit,
+                        Credit = detail.Credit
+                    });
                 }
             }
 
-            generalJournalHeader.GeneralJournalDetails = details;
+            generalJournalHeader.JournalItems = journalItems;
         }
 
 

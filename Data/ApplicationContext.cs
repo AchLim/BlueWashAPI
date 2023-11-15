@@ -104,8 +104,8 @@ namespace WebAPI.Data
         public DbSet<ChartOfAccount> ChartOfAccounts { get; set; } = default!;
         public DbSet<Currency> Currencies { get; set; } = default!;
         public DbSet<Customer> Customers { get; set; } = default!;
-        public DbSet<GeneralJournalDetail> GeneralJournalDetails { get; set; } = default!;
-        public DbSet<GeneralJournalHeader> GeneralJournalHeaders { get; set; } = default!;
+        public DbSet<JournalItem> JournalItems { get; set; } = default!;
+        public DbSet<JournalEntry> JournalEntries { get; set; } = default!;
         public DbSet<Inventory> Inventories { get; set; } = default!;
         public DbSet<PurchaseDetail> PurchaseDetails { get; set; } = default!;
         public DbSet<PurchaseHeader> PurchaseHeaders { get; set; } = default!;

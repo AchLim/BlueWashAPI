@@ -33,8 +33,8 @@ namespace WebAPI.Models
         public virtual Currency? Currency { get; set; }
         public Guid? CurrencyId { get; set; }
 
-        // FK - General Account Detail
-        public ICollection<GeneralJournalDetail>? GeneralJournalDetails { get; set; }
+        // FK - Journal Item
+        public ICollection<JournalItem>? JournalItems { get; set; }
 
         // Auditable
         public DateTime? Created { get; set; }

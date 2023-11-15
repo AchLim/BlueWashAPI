@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebAPI.Models.DTO
 {
-    public class GeneralJournalDetailDto
+    public class JournalItemDto
     {
         public Guid ChartOfAccountId { get; set; }
 
@@ -15,11 +15,11 @@ namespace WebAPI.Models.DTO
         [Precision(19, 4)]
         public decimal Credit { get; set; }
     }
-    public class GeneralJournalDetailUpdateDto
+    public class JournalItemUpdateDto
     {
-        public Guid? GeneralJournalHeaderId { get; set; }
+        public Guid? JournalEntryId { get; set; }
 
-        public Guid? GeneralJournalDetailId { get; set; }
+        public Guid JournalItemId { get; set; }
 
         public Guid ChartOfAccountId { get; set; }
 
