@@ -12,6 +12,11 @@ namespace WebAPI.Utility
             currency.Code = dto.Code;
             currency.CultureName = dto.CultureName;
         }
+        public static void PassData(this InventoryUpdateDto dto, ref Inventory inventory)
+        {
+            inventory.ItemNo = dto.ItemNo;
+            inventory.ItemName = dto.ItemName;
+        }
 
         public static void PassData(this LaundryServiceUpdateDto dto, ref LaundryService laundryService)
         {
@@ -53,11 +58,11 @@ namespace WebAPI.Utility
             chartOfAccount.AccountName = dto.AccountName;
         }
 
-        public static void PassData(this JournalEntryUpdateDto dto, ref JournalEntry generalJournalHeader)
+        public static void PassData(this JournalEntryUpdateDto dto, ref JournalEntry journalEntry)
         {
-            generalJournalHeader.TransactionNo = dto.TransactionNo;
-            generalJournalHeader.TransactionDate = dto.TransactionDate;
-            generalJournalHeader.Description = dto.Description;
+            journalEntry.TransactionNo = dto.TransactionNo;
+            journalEntry.TransactionDate = dto.TransactionDate;
+            journalEntry.Description = dto.Description;
 
             List<JournalItem> journalItems = new();
 
@@ -75,7 +80,33 @@ namespace WebAPI.Utility
                 }
             }
 
-            generalJournalHeader.JournalItems = journalItems;
+            journalEntry.JournalItems = journalItems;
+        }
+
+        public static void PassData(this PurchaseHeaderUpdateDto dto, ref PurchaseHeader purchaseHeader)
+        {
+            purchaseHeader.PurchaseNo = dto.PurchaseNo;
+            purchaseHeader.PurchaseDate = dto.PurchaseDate;
+            purchaseHeader.SupplierId = dto.SupplierId;
+            purchaseHeader.Description = dto.Description;
+
+            List<PurchaseDetail> purchaseDetails = new();
+
+            if (dto.PurchaseDetails.IsNotEmpty())
+            {
+                foreach (var detail in dto.PurchaseDetails!)
+                {
+                    purchaseDetails.Add(new PurchaseDetail
+                    {
+                        PurchaseDetailId = detail.PurchaseDetailId,
+                        InventoryId = detail.InventoryId,
+                        Quantity = detail.Quantity,
+                        Price = detail.Price
+                    });
+                }
+            }
+
+            purchaseHeader.PurchaseDetails = purchaseDetails;
         }
 
 
