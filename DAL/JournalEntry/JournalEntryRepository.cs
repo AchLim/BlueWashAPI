@@ -25,8 +25,8 @@ namespace WebAPI.DAL
                 try
                 {
                     journalEntries = await _context.JournalEntries
-                                                            .Include(entry => entry.JournalItems!)
-                                                            .ThenInclude(items => items.ChartOfAccount)
+                                                            //.Include(entry => entry.JournalItems!)
+                                                            //.ThenInclude(items => items.ChartOfAccount)
                                                             .ToListAsync();
                 }
                 catch (System.Exception ex)
