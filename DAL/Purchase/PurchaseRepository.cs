@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFramework.Exceptions.Common;
+using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.Exception;
 using WebAPI.Models;
@@ -12,6 +13,125 @@ namespace WebAPI.DAL
         public PurchaseRepository(ApplicationContext context)
         {
             _context = context;
+        }
+
+        public async Task<IEnumerable<PurchaseHeader>> GetAllPurchaseHeaders()
+        {
+            IEnumerable<PurchaseHeader> purchaseHeaders = Enumerable.Empty<PurchaseHeader>();
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    purchaseHeaders = await _context.PurchaseHeaders
+                                                            .Include(header => header.Supplier!)
+                                                            .ToListAsync();
+                }
+                catch (System.Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data pembelian.", ex);
+                }
+            }
+
+            return purchaseHeaders;
+        }
+
+        public async Task<PurchaseHeader?> GetPurchaseHeaderById(Guid id)
+        {
+            PurchaseHeader? purchaseHeader = null;
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    purchaseHeader = await _context.PurchaseHeaders
+                                                            .Include(header => header.Supplier)
+                                                            .Include(header => header.PurchaseDetails!)
+                                                            .ThenInclude(detail => detail.Inventory)
+                                                            .FirstOrDefaultAsync(header => header.Id == id);
+                }
+                catch (System.Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseReadException($"Terjadi kesalahan dalam pengambilan data pembelian dengan id: {id}", ex);
+                }
+            }
+
+            return purchaseHeader;
+        }
+
+        public async Task InsertPurchaseHeader(PurchaseHeader purchaseHeader)
+        {
+            if (purchaseHeader.PurchaseNo.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nomor Pembelian tidak boleh kosong!", null);
+
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    await _context.PurchaseHeaders.AddAsync(purchaseHeader);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (UniqueConstraintException ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseUniqueConstraintException($@"
+                        Terjadi kesalahan dalam memperbarui data pembelian dengan nomor pembelian: {purchaseHeader.PurchaseNo}.
+                        Nomor transaksi '{purchaseHeader.PurchaseNo}' sudah digunakan. Pastikan anda menggunakan nomor pembelian yang unik.
+                    ", ex);
+                }
+                catch (System.Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseInsertException($"Terjadi kesalahan dalam menambahkan data pembelian dengan nomor transaksi: {purchaseHeader.PurchaseNo}", ex);
+                }
+            }
+        }
+        public async Task UpdatePurchaseHeader(PurchaseHeader purchaseHeader)
+        {
+            if (purchaseHeader.PurchaseNo.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nomor Transaksi tidak boleh kosong!", null);
+
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    _context.PurchaseHeaders.Update(purchaseHeader);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (UniqueConstraintException ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseUniqueConstraintException($@"
+                        Terjadi kesalahan dalam memperbarui data pembelian dengan nomor pembelian: {purchaseHeader.PurchaseNo}.
+                        Nomor pembelian '{purchaseHeader.PurchaseNo}' sudah digunakan. Pastikan anda menggunakan nomor pembelian yang unik.
+                    ", ex);
+                }
+                catch (System.Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseUpdateException($"Terjadi kesalahan dalam memperbarui data pembelian dengan nomor pembelian: {purchaseHeader.PurchaseNo}", ex);
+                }
+            }
+        }
+        public async Task DeletePurchaseHeader(PurchaseHeader purchaseHeader)
+        {
+
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    _context.PurchaseHeaders.Remove(purchaseHeader);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (System.Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseDeleteException($"Terjadi kesalahan dalam menghapus data pembelian dengan nomor pembelian: {purchaseHeader.PurchaseNo}", ex);
+                }
+            }
         }
 
         public async Task<IEnumerable<ItemPurchaseContainer>> GetTotalItemPurchaseData()
