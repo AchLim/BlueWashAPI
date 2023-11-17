@@ -20,15 +20,9 @@ namespace WebAPI.Models
         [Required]
         public virtual PurchaseHeader PurchaseHeader { get; set; } = default!;
 
-        [DisplayName("Nomor Pembelian")]
-        public string PurchaseNo => PurchaseHeader.PurchaseNo;
-
         [Required]
         public virtual Inventory Inventory { get; set; } = default!;
         public Guid InventoryId { get; set; }
-
-        [DisplayName("Nomor Pembelian")]
-        public string ItemNo => Inventory.ItemNo;
 
 
         [Precision(19, 4)]

@@ -26,9 +26,6 @@ namespace WebAPI.Models
         public virtual Supplier Supplier { get; set; } = default!;
         public Guid SupplierId { get; set; }
 
-        [DisplayName("Kode Supplier")]
-        public string SupplierCode => Supplier.SupplierCode;
-
         [DisplayName("Deskripsi")]
         public string? Description { get; set; }
 
