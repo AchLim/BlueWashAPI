@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebAPI.Models.DTO
 {
@@ -14,6 +11,9 @@ namespace WebAPI.Models.DTO
 
         [Precision(19, 4)]
         public decimal Price { get; set; }
+
+        [Precision(19, 4)]
+        public decimal Discount { get; set; }
     }
     public class PurchaseDetailUpdateDto
     {
@@ -28,5 +28,8 @@ namespace WebAPI.Models.DTO
 
         [Precision(19, 4)]
         public decimal Price { get; set; }
+
+        [Precision(19, 4)]
+        public decimal Discount { get; set; }
     }
 }

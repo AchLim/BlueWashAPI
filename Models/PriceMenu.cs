@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Globalization;
 using WebAPI.Models.Common;
 
 namespace WebAPI.Models
@@ -29,18 +27,17 @@ namespace WebAPI.Models
 
         [Required]
         [EnumDataType(typeof(PricingOption))]
-        public PricingOption PricingOption { get; set; }
-
+        public string PricingOption { get; set; } = Models.PricingOption.Unit.ToString();
 
         public int ProcessingTime { get; set; }
-
+         
         [Required]
         [EnumDataType(typeof(TimeUnit))]
-        public TimeUnit TimeUnit { get; set; }
+        public string TimeUnit { get; set; } = Models.TimeUnit.None.ToString();
 
         [Required]
         [EnumDataType(typeof(DeliveryOption))]
-        public DeliveryOption DeliveryOption { get; set; }
+        public string DeliveryOption { get; set; } = Models.DeliveryOption.None.ToString();
 
         public ICollection<SalesDetail>? SalesDetails { get; set; }
 
@@ -49,64 +46,28 @@ namespace WebAPI.Models
         public string? CreatedBy { get; set; }
         public DateTime? LastModified { get; set; }
         public string? LastModifiedBy { get; set; }
-
-        // Helper
-
-        [NotMapped]
-        public string PricingOptionDisplay => PricingOption switch
-        {
-            PricingOption.Package => "Paket",
-            _ => PricingOption.ToString(),
-        };
-
-        [NotMapped]
-        public string TimeUnitDisplay => TimeUnit switch
-        {
-            TimeUnit.Hour => "Jam",
-            TimeUnit.Day => "Hari",
-            _ => "-"
-        };
-
-        [NotMapped]
-        public string DeliveryOptionDisplay => DeliveryOption switch
-        {
-            DeliveryOption.None => "-",
-            DeliveryOption.OneDay => "One Day",
-            _ => DeliveryOption.ToString(),
-        };
-
-        [NotMapped]
-        public string ProcessingTimeDisplay => (ProcessingTime, TimeUnit) switch
-        {
-            (_, TimeUnit.None) => "-",
-            (_, _) => $"{ProcessingTime} {TimeUnitDisplay}",
-        };
-
-        [NotMapped]
-        public string PriceDisplay => string.Format(new CultureInfo("id-ID"), "{0:C}", Price);
-
     }
 
-    public enum PricingOption : ushort
+    public enum PricingOption
     {
-        Unit = 1,
-        Kilogram = 2,
-        Set = 4,
-        Package = 8,
+        Unit,
+        Kilogram,
+        Set,
+        Package,
     }
 
-    public enum TimeUnit : ushort
+    public enum TimeUnit
     {
-        None = 0,
-        Hour = 1,
-        Day = 2,
+        None,
+        Hour,
+        Day,
     }
 
-    public enum DeliveryOption : ushort
+    public enum DeliveryOption
     {
-        None = 0,
-        Reguler = 1,
-        OneDay = 2,
-        Express = 4,
+        None,
+        Reguler,
+        OneDay,
+        Express,
     }
 }

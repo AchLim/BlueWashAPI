@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 using WebAPI.Models.Common;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebAPI.Data.Enum;
 
 namespace WebAPI.Models
 {
     [Table("journal_entry")]
-    [Index(nameof(TransactionNo), IsUnique = true)]
     public class JournalEntry : IAuditable
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -16,15 +15,21 @@ namespace WebAPI.Models
 
         [Required]
         [StringLength(80, MinimumLength = 1, ErrorMessage = "Nomor Transaksi tidak boleh kosong.")]
-        [DisplayName("Nomor Transaksi")]
         public string TransactionNo { get; set; } = default!;
 
         [Required]
-        [DisplayName("Tanggal Transaksi")]
         public DateOnly TransactionDate { get; set; }
+
+        [Required]
+        [EnumDataType(typeof(EntryStatus))]
+        public string Status { get; set; } = EntryStatus.Draft.ToString();
 
         [DisplayName("Deskripsi")]
         public string? Description { get; set; }
+
+        // FK - Closing Entry
+        public virtual ClosingEntry? ClosingEntry { get; set; }
+        public Guid? ClosingEntryId { get; set; }
 
         // FK - Journal Item
         public ICollection<JournalItem>? JournalItems { get; set; }

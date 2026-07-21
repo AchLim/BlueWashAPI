@@ -7,6 +7,7 @@ namespace WebAPI.Models.DTO
         public required string CustomerCode { get; set; }
         public required string CustomerName { get; set; }
         public string? CustomerAddress { get; set; }
+        public string? MobileNumber { get; set; }
         public Guid? CurrencyId { get; set; }
     }
     public class CustomerUpdateDto
@@ -15,6 +16,7 @@ namespace WebAPI.Models.DTO
         public required string CustomerCode { get; set; }
         public required string CustomerName { get; set; }
         public string? CustomerAddress { get; set; }
+        public string? MobileNumber { get; set; }
         public Guid? CurrencyId { get; set; }
     }
 }

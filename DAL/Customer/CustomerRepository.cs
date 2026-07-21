@@ -64,6 +64,16 @@ namespace WebAPI.DAL
             if (customer.CustomerCode.Trim() == string.Empty)
                 throw new DatabaseInsertException("Kode Pelanggan tidak boleh kosong!", null);
 
+            if (customer.MobileNumber is not null)
+            {
+                customer.MobileNumber = customer.MobileNumber.Trim();
+                if (!customer.MobileNumber.StartsWith('+'))
+                    throw new DatabaseInsertException("Nomor HP harus diawali dengan simbol + (Contoh: +62xxxxxxxxxx)", null);
+
+                if (customer.MobileNumber.Length < 7)
+                    throw new DatabaseInsertException("Nomor HP tidak valid", null);
+            }
+
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
@@ -95,6 +105,16 @@ namespace WebAPI.DAL
 
             if (customer.CustomerCode.Trim() == string.Empty)
                 throw new DatabaseUpdateException("Kode Pelanggan tidak boleh kosong!", null);
+
+            if (customer.MobileNumber is not null)
+            {
+                customer.MobileNumber = customer.MobileNumber.Trim();
+                if (!customer.MobileNumber.StartsWith('+'))
+                    throw new DatabaseInsertException("Nomor HP harus diawali dengan simbol + (Contoh: +62xxxxxxxxxx)", null);
+
+                if (customer.MobileNumber.Length < 7)
+                    throw new DatabaseInsertException("Nomor HP tidak valid", null);
+            }
 
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {

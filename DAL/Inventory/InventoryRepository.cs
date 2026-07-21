@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFramework.Exceptions.Common;
+using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.Exception;
 using WebAPI.Models;
@@ -56,6 +57,12 @@ namespace WebAPI.DAL
 
         public async Task InsertInventory(Inventory inventory)
         {
+            if (inventory.ItemName.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nama barang tidak boleh kosong!", null);
+
+            if (inventory.ItemNo.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nomor barang tidak boleh kosong!", null);
+
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
@@ -63,6 +70,14 @@ namespace WebAPI.DAL
                     await _context.Inventories.AddAsync(inventory);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
+                }
+                catch (UniqueConstraintException ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseUniqueConstraintException($@"
+                        Terjadi kesalahan dalam memperbarui data persediaan dengan nama: {inventory.ItemName}.
+                        Nomor Barang '{inventory.ItemNo}' sudah digunakan. Pastikan anda menggunakan nomor yang unik.
+                    ", ex);
                 }
                 catch (System.Exception ex)
                 {
@@ -74,6 +89,12 @@ namespace WebAPI.DAL
 
         public async Task UpdateInventory(Inventory inventory)
         {
+            if (inventory.ItemName.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nama barang tidak boleh kosong!", null);
+
+            if (inventory.ItemNo.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nomor barang tidak boleh kosong!", null);
+
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
@@ -81,6 +102,14 @@ namespace WebAPI.DAL
                     _context.Inventories.Update(inventory);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
+                }
+                catch (UniqueConstraintException ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseUniqueConstraintException($@"
+                        Terjadi kesalahan dalam memperbarui data persediaan dengan nama: {inventory.ItemName}.
+                        Nomor Barang '{inventory.ItemNo}' sudah digunakan. Pastikan anda menggunakan nomor yang unik.
+                    ", ex);
                 }
                 catch (System.Exception ex)
                 {

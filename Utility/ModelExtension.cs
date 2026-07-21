@@ -1,5 +1,4 @@
-﻿using WebAPI.DTO;
-using WebAPI.Models;
+﻿using WebAPI.Models;
 using WebAPI.Models.DTO;
 
 namespace WebAPI.Utility
@@ -17,29 +16,23 @@ namespace WebAPI.Utility
             inventory.ItemNo = dto.ItemNo;
             inventory.ItemName = dto.ItemName;
         }
-
-        public static void PassData(this LaundryServiceUpdateDto dto, ref LaundryService laundryService)
+        public static void PassData(this MessageTemplateUpdateDto dto, ref MessageTemplate template)
         {
-            laundryService.Name = dto.Name;
-
-            var result = 0;
-
-            if (dto.LaundryProcessWash)
-                result |= (ushort)LaundryProcess.Wash;
-
-            if (dto.LaundryProcessDry)
-                result |= (ushort)LaundryProcess.Dry;
-
-            if (dto.LaundryProcessIron)
-                result |= (ushort)LaundryProcess.Iron;
-
-            laundryService.LaundryProcess = (LaundryProcess)result;
+            template.Name = dto.Name;
+            template.Template = dto.Template;
+        }
+        public static void PassData(this CompanyUpdateDto dto, ref Company company)
+        {
+            company.Name = dto.Name;
+            company.Address = dto.Address;
+            company.MobileNumber = dto.MobileNumber;
         }
         public static void PassData(this CustomerUpdateDto dto, ref Customer customer)
         {
             customer.CustomerName = dto.CustomerName;
             customer.CustomerCode = dto.CustomerCode;
             customer.CustomerAddress = dto.CustomerAddress;
+            customer.MobileNumber = dto.MobileNumber;
             customer.CurrencyId = dto.CurrencyId;
         }
         public static void PassData(this SupplierUpdateDto dto, ref Supplier supplier)
@@ -62,6 +55,7 @@ namespace WebAPI.Utility
         {
             journalEntry.TransactionNo = dto.TransactionNo;
             journalEntry.TransactionDate = dto.TransactionDate;
+            journalEntry.Status = dto.Status;
             journalEntry.Description = dto.Description;
 
             List<JournalItem> journalItems = new();
@@ -89,6 +83,9 @@ namespace WebAPI.Utility
             purchaseHeader.PurchaseDate = dto.PurchaseDate;
             purchaseHeader.SupplierId = dto.SupplierId;
             purchaseHeader.Description = dto.Description;
+            purchaseHeader.PaymentTerm = dto.PaymentTerm;
+            purchaseHeader.Status = dto.Status;
+            purchaseHeader.PaymentStatus = dto.PaymentStatus;
 
             List<PurchaseDetail> purchaseDetails = new();
 
@@ -101,12 +98,109 @@ namespace WebAPI.Utility
                         PurchaseDetailId = detail.PurchaseDetailId,
                         InventoryId = detail.InventoryId,
                         Quantity = detail.Quantity,
-                        Price = detail.Price
+                        Price = detail.Price,
+                        Discount = detail.Discount,
                     });
                 }
             }
 
             purchaseHeader.PurchaseDetails = purchaseDetails;
+
+            List<PurchasePayment> purchasePayments = new();
+
+            if (dto.PurchasePayments.IsNotEmpty())
+            {
+                foreach (var payment in dto.PurchasePayments!)
+                {
+                    purchasePayments.Add(new PurchasePayment
+                    {
+                        PurchasePaymentId = payment.PurchasePaymentId,
+                        PaymentDate = payment.PaymentDate,
+                        Type = payment.Type,
+                        ReferenceNumber = payment.ReferenceNumber,
+                        Amount = payment.Amount
+                    });
+                }
+            }
+
+            purchaseHeader.PurchasePayments = purchasePayments;
+        }
+
+        public static void PassData(this SalesHeaderUpdateDto dto, ref SalesHeader salesHeader)
+        {
+            salesHeader.SalesNo = dto.SalesNo;
+            salesHeader.SalesDate = dto.SalesDate;
+            salesHeader.CustomerId = dto.CustomerId;
+            salesHeader.Description = dto.Description;
+            salesHeader.PaymentTerm = dto.PaymentTerm;
+            salesHeader.Status = dto.Status;
+            salesHeader.PaymentStatus = dto.PaymentStatus;
+
+            List<SalesDetail> salesDetails = new();
+
+            if (dto.SalesDetails.IsNotEmpty())
+            {
+                foreach (var detail in dto.SalesDetails!)
+                {
+                    salesDetails.Add(new SalesDetail
+                    {
+                        SalesDetailId = detail.SalesDetailId,
+                        LaundryServiceId = detail.LaundryServiceId,
+                        PriceMenuId = detail.PriceMenuId,
+                        Quantity = detail.Quantity,
+                        Price = detail.Price,
+                        Discount = detail.Discount,
+                    });
+                }
+            }
+
+            salesHeader.SalesDetails = salesDetails;
+
+            List<SalesPayment> salesPayments = new();
+
+            if (dto.SalesPayments.IsNotEmpty())
+            {
+                foreach (var payment in dto.SalesPayments!)
+                {
+                    salesPayments.Add(new SalesPayment
+                    {
+                        SalesPaymentId = payment.SalesPaymentId,
+                        PaymentDate = payment.PaymentDate,
+                        Type = payment.Type,
+                        ReferenceNumber = payment.ReferenceNumber,
+                        Amount = payment.Amount
+                    });
+                }
+            }
+
+            salesHeader.SalesPayments = salesPayments;
+        }
+
+        public static void PassData(this LaundryServiceUpdateDto dto, ref LaundryService laundryService)
+        {
+            laundryService.Name = dto.Name;
+            laundryService.LaundryProcess = dto.LaundryProcess;
+
+            List<PriceMenu> priceMenus = new();
+
+            if (dto.PriceMenus.IsNotEmpty())
+            {
+                foreach (var menu in dto.PriceMenus!)
+                {
+                    priceMenus.Add(new PriceMenu
+                    {
+                        PriceMenuId = menu.PriceMenuId,
+                        Name = menu.Name,
+                        Price = menu.Price,
+                        PricingOption = menu.PricingOption,
+                        DeliveryOption = menu.DeliveryOption,
+                        ProcessingTime = menu.ProcessingTime,
+                        TimeUnit = menu.TimeUnit
+                    });
+                }
+            }
+
+            laundryService.PriceMenus = priceMenus;
         }
 
 

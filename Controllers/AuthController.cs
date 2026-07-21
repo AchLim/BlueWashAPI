@@ -52,7 +52,7 @@ namespace WebAPI.Controllers
                         await transaction.CommitAsync();
 
                         _context.Entry(user)
-                                .Collection(u => u.UserRoles)
+                                .Collection(u => u.UserRoles!)
                                 .Query()
                                 .Include(ur => ur.ApplicationRole)
                                 .Load();
@@ -84,6 +84,46 @@ namespace WebAPI.Controllers
                 username = user.Username,
                 accessToken = token,
             });
+        }
+
+        [HttpGet("logout")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LogoutAsync()
+        {
+            ApplicationUser? user = null;
+            string? refreshToken = Request.Cookies["_bw_id"];
+
+            if (refreshToken == null)
+                return Unauthorized();
+
+            if (refreshToken.Trim() == string.Empty)
+                throw new InvalidDataException("Token autentikasi kedaluwarsa atau tidak ditemukan. Harap login kembali untuk melanjutkan.");
+
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    user = await _context.Users
+                                         .Where(u => u.RefreshToken.Equals(refreshToken))
+                                         .FirstOrDefaultAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseReadException("Terjadi kesalahan dalam melakukan logout.");
+                }
+            }
+            if (user is null)
+            {
+                throw new UserNotFoundException("Kredensial tidak ditemukan!");
+            }
+
+            string token = _jwtProvider.Generate(user);
+
+            Response.Cookies.Append("_bw_id", user.RefreshToken,
+                new CookieOptions { Expires = DateTime.Now.AddDays(-1) });
+
+            return Ok();
         }
 
         [HttpGet("refresh-token")]

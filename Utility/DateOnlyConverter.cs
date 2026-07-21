@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Data;
 
 namespace WebAPI.Utility
 {

@@ -27,6 +27,10 @@ namespace WebAPI.Models
         [DisplayName("Alamat Pelanggan")]
         public string? CustomerAddress { get; set; }
 
+        [StringLength(30)]
+        [DataType(DataType.PhoneNumber)]
+        public string? MobileNumber { get; set; }
+
         [DisplayName("Mata Uang")]
         public virtual Currency? Currency { get; set; }
         public Guid? CurrencyId { get; set; }

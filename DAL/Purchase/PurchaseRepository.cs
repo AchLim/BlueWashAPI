@@ -1,6 +1,7 @@
 ﻿using EntityFramework.Exceptions.Common;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
+using WebAPI.Data.Enum;
 using WebAPI.Exception;
 using WebAPI.Models;
 
@@ -15,6 +16,12 @@ namespace WebAPI.DAL
             _context = context;
         }
 
+        public async Task<string> GetNextSequencePurchaseNo(string purchaseDate)
+        {
+            var result = (await _context.Database.SqlQuery<string>($"EXECUTE GetPurchaseNo {purchaseDate};").ToListAsync()).FirstOrDefault();
+            return result!;
+        }
+
         public async Task<IEnumerable<PurchaseHeader>> GetAllPurchaseHeaders()
         {
             IEnumerable<PurchaseHeader> purchaseHeaders = Enumerable.Empty<PurchaseHeader>();
@@ -23,6 +30,7 @@ namespace WebAPI.DAL
                 try
                 {
                     purchaseHeaders = await _context.PurchaseHeaders
+                                                            .Include(header => header.PurchaseDetails)
                                                             .Include(header => header.Supplier!)
                                                             .ToListAsync();
                 }
@@ -47,6 +55,7 @@ namespace WebAPI.DAL
                                                             .Include(header => header.Supplier)
                                                             .Include(header => header.PurchaseDetails!)
                                                             .ThenInclude(detail => detail.Inventory)
+                                                            .Include(header => header.PurchasePayments!.OrderBy(pp => pp.PaymentDate))
                                                             .FirstOrDefaultAsync(header => header.Id == id);
                 }
                 catch (System.Exception ex)
@@ -68,17 +77,10 @@ namespace WebAPI.DAL
             {
                 try
                 {
+                    purchaseHeader.PurchaseNo = "/";
                     await _context.PurchaseHeaders.AddAsync(purchaseHeader);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
-                }
-                catch (UniqueConstraintException ex)
-                {
-                    await transaction.RollbackAsync();
-                    throw new DatabaseUniqueConstraintException($@"
-                        Terjadi kesalahan dalam memperbarui data pembelian dengan nomor pembelian: {purchaseHeader.PurchaseNo}.
-                        Nomor transaksi '{purchaseHeader.PurchaseNo}' sudah digunakan. Pastikan anda menggunakan nomor pembelian yang unik.
-                    ", ex);
                 }
                 catch (System.Exception ex)
                 {
@@ -96,6 +98,16 @@ namespace WebAPI.DAL
             {
                 try
                 {
+                    if (purchaseHeader.PurchaseNo == "/" && purchaseHeader.Status == EntryStatus.Posted.ToString())
+                    {
+                        var newPurchaseNo = await GetNextSequencePurchaseNo(purchaseHeader.PurchaseDate.ToString("yyyy-MM-dd"));
+                        bool exist = await _context.PurchaseHeaders.AnyAsync(ph => ph.PurchaseNo == newPurchaseNo);
+                        if (exist)
+                            throw new UniqueConstraintException();
+
+                        purchaseHeader.PurchaseNo = newPurchaseNo;
+                    }
+
                     _context.PurchaseHeaders.Update(purchaseHeader);
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
@@ -132,6 +144,27 @@ namespace WebAPI.DAL
                     throw new DatabaseDeleteException($"Terjadi kesalahan dalam menghapus data pembelian dengan nomor pembelian: {purchaseHeader.PurchaseNo}", ex);
                 }
             }
+        }
+
+        public async Task<IEnumerable<PurchasePayment>> GetAllPurchasePayments()
+        {
+            IEnumerable<PurchasePayment> purchasePayments = Enumerable.Empty<PurchasePayment>();
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    purchasePayments = await _context.PurchasePayments
+                                                     .Include(pp => pp.PurchaseHeader)
+                                                     .ToListAsync();
+                }
+                catch (System.Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new DatabaseReadException("Terjadi kesalahan dalam pengambilan data pembayaran pembelian.", ex);
+                }
+            }
+
+            return purchasePayments;
         }
 
         public async Task<IEnumerable<ItemPurchaseContainer>> GetTotalItemPurchaseData()
@@ -264,6 +297,7 @@ namespace WebAPI.DAL
                                                Subtotal = group.Sum(item => item.Subtotal),
                                            });
         }
+
         #endregion
     }
     public class ItemPurchaseContainer

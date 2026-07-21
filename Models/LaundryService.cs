@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using WebAPI.Models.Common;
-using System.ComponentModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Models
@@ -18,7 +17,7 @@ namespace WebAPI.Models
 
         [Required]
         [EnumDataType(typeof(LaundryProcess))]
-        public LaundryProcess LaundryProcess { get; set; }
+        public ushort LaundryProcess { get; set; } = (ushort)(Models.LaundryProcess.Wash | Models.LaundryProcess.Dry | Models.LaundryProcess.Iron);
 
 
         // FK - One to many to Price Menu
@@ -29,11 +28,6 @@ namespace WebAPI.Models
         public string? CreatedBy { get; set; }
         public DateTime? LastModified { get; set; }
         public string? LastModifiedBy { get; set; }
-
-        // Helper
-        [NotMapped] public bool LaundryProcessWash => (LaundryProcess & LaundryProcess.Wash) == LaundryProcess.Wash;
-        [NotMapped] public bool LaundryProcessDry => (LaundryProcess & LaundryProcess.Dry) == LaundryProcess.Dry;
-        [NotMapped] public bool LaundryProcessIron => (LaundryProcess & LaundryProcess.Iron) == LaundryProcess.Iron;
     }
 
     [Flags]

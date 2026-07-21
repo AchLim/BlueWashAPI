@@ -22,21 +22,20 @@ namespace WebAPI.Models
 
         [Required]
         public virtual LaundryService LaundryService { get; set; } = default!;
-
         public Guid LaundryServiceId { get; set; }
 
         [Required]
         public virtual PriceMenu PriceMenu { get; set; } = default!;
-
         public Guid PriceMenuId { get; set; }
 
 
         [Precision(19, 4)]
-        [DisplayName("Kuantitas")]
         public decimal Quantity { get; set; }
 
         [Precision(19, 4)]
-        [DisplayName("Harga")]
+        public decimal Discount { get; set; }
+
+        [Precision(19, 4)]
         public decimal Price { get; set; }
 
 

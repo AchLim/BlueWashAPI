@@ -3,6 +3,7 @@ using WebAPI.Models.Common;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebAPI.Data.Enum;
 
 namespace WebAPI.Models
 {
@@ -22,8 +23,11 @@ namespace WebAPI.Models
         [Required]
         public virtual SalesHeader SalesHeader { get; set; } = default!;
 
-        [DisplayName("Nomor Penjualan")]
-        public string SalesNo => SalesHeader.SalesNo;
+        public DateOnly PaymentDate { get; set; }
+
+        [Required]
+        [EnumDataType(typeof(PaymentType))]
+        public string Type { get; set; } = PaymentType.Cash.ToString();
 
         [DisplayName("Nomor Referensi")]
         public string? ReferenceNumber { get; set; }

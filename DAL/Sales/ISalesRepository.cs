@@ -4,10 +4,17 @@ namespace WebAPI.DAL
 {
     public interface ISalesRepository
     {
-        Task<IEnumerable<SalesReportContainer>> GetSalesData();
-        Task<IEnumerable<ItemSalesContainer>> GetTotalItemSalesData();
-        Task<IEnumerable<SalesPaymentContainer>> GetTotalSalesPaymentData();
-        Task<IEnumerable<SalesPerInvoiceContainer>> GetTotalSalesPerInvoiceData();
-        Task<IEnumerable<AccountReceivableBalanceContainer>> GetAccountReceivableBalanceData();
+        Task<IEnumerable<SalesHeader>> GetAllSalesHeaders();
+        Task<SalesHeader?> GetSalesHeaderById(Guid id);
+        Task InsertSalesHeader(SalesHeader salesHeader);
+        Task UpdateSalesHeader(SalesHeader salesHeader);
+        Task DeleteSalesHeader(SalesHeader salesHeader);
+
+        Task<IEnumerable<SalesPayment>> GetAllSalesPayments();
+        //Task<IEnumerable<SalesReportContainer>> GetSalesData();
+        //Task<IEnumerable<ItemSalesContainer>> GetTotalItemSalesData();
+        //Task<IEnumerable<SalesPaymentContainer>> GetTotalSalesPaymentData();
+        //Task<IEnumerable<SalesPerInvoiceContainer>> GetTotalSalesPerInvoiceData();
+        //Task<IEnumerable<AccountReceivableBalanceContainer>> GetAccountReceivableBalanceData();
     }
 }

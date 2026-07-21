@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DAL;
-using WebAPI.DTO;
 using WebAPI.Models;
 using WebAPI.Models.DTO;
 using WebAPI.Models.Mapper;
@@ -37,15 +36,14 @@ namespace WebAPI.Controllers
             return Ok(laundryService);
         }
 
-        //[HttpPost("insert")]
-        //public async Task<ActionResult<LaundryService>> PostCurrency([FromBody] CurrencyDto currencyDto)
-        //{
-        //    CurrencyMapper currencyMapper = new();
-        //    Currency currency = currencyMapper.CurrencyDtoToCurrency(currencyDto);
-        //    await _currencyRepository.InsertCurrency(currency);
+        [HttpPost("insert")]
+        public async Task<ActionResult<LaundryService>> PostLaundryService([FromBody] LaundryServiceDto laundryServiceDto)
+        {
+            LaundryService laundryService = LaundryServiceMapper.LaundryServiceDtoToLaundryService(laundryServiceDto);
+            await _laundryServiceRepository.InsertLaundryService(laundryService);
 
-        //    return CreatedAtAction(nameof(GetCurrencyById), new { id = currency.Id }, currency);
-        //}
+            return CreatedAtAction(nameof(GetLaundryServiceById), new { id = laundryService.Id }, laundryService);
+        }
 
         [HttpPut("update/{id}")]
         public async Task<ActionResult<LaundryService>> UpdateLaundryService(Guid id, [FromBody] LaundryServiceUpdateDto laundryServiceUpdateDto)

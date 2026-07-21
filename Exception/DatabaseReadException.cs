@@ -2,7 +2,7 @@
 {
     public class DatabaseReadException : System.Exception
     {
-        public DatabaseReadException(string? message, System.Exception? innerException) : base(message, innerException)
+        public DatabaseReadException(string? message, System.Exception? innerException = null) : base(message, innerException)
         {
         }
     }

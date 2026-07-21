@@ -26,11 +26,12 @@ namespace WebAPI.Models
 
 
         [Precision(19, 4)]
-        [DisplayName("Kuantitas")]
         public decimal Quantity { get; set; }
 
         [Precision(19, 4)]
-        [DisplayName("Harga")]
+        public decimal Discount { get; set; }
+
+        [Precision(19, 4)]
         public decimal Price { get; set; }
 
         // Auditable

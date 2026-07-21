@@ -126,7 +126,7 @@ namespace Book_Lending_System.Data
                             Username = "staff",
                             Login = Staff,
                             EmailAddress = "bluewash.user@example.com",
-                            PasswordHash = BCrypt.Net.BCrypt.HashPassword("b1u3w45h_5t4ff"),
+                            PasswordHash = BCrypt.Net.BCrypt.HashPassword("123"),
                         };
 
                         await context.Users.AddAsync(staffUser);
@@ -145,6 +145,140 @@ namespace Book_Lending_System.Data
                         }
                     }
 
+
+                    /* Test */
+
+                    // Test 1
+                    if (await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username.ToUpper() == "TESTUSER") is null)
+                    {
+                        var testUser = new ApplicationUser
+                        {
+                            Username = "testuser",
+                            Login = "testuser",
+                            EmailAddress = "bluewash.testuser@example.com",
+                            PasswordHash = BCrypt.Net.BCrypt.HashPassword("123"),
+                        };
+
+                        await context.Users.AddAsync(testUser);
+                        await context.SaveChangesAsync();
+
+                        List<ApplicationRole> roles = await context.Roles.AsNoTracking().ToListAsync();
+                        List<ApplicationUserRole> userRoles = new(roles.Count);
+                        foreach (var role in roles)
+                        {
+                            userRoles.Add(new ApplicationUserRole
+                            {
+                                ApplicationUserId = testUser.Id,
+                                ApplicationRoleId = role.Id
+                            });
+                        }
+
+                        await context.UserRoles.AddRangeAsync(userRoles);
+                        await context.SaveChangesAsync();
+
+                        List<Menu> menus = await context.Menus.AsNoTracking().ToListAsync();
+                        List<UserMenu> userMenus = new(menus.Count);
+                        foreach (var menu in menus)
+                        {
+                            userMenus.Add(new UserMenu
+                            {
+                                ApplicationUserId = testUser.Id,
+                                MenuId = menu.Id,
+                            });
+                        }
+
+                        await context.UserMenus.AddRangeAsync(userMenus);
+                        await context.SaveChangesAsync();
+                    }
+
+                    // Test 2
+                    if (await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username.ToUpper() == "TESTUSER2") is null)
+                    {
+                        var testUser = new ApplicationUser
+                        {
+                            Username = "testuser2",
+                            Login = "testuser2",
+                            EmailAddress = "bluewash.testuser2@example.com",
+                            PasswordHash = BCrypt.Net.BCrypt.HashPassword("123"),
+                        };
+
+                        await context.Users.AddAsync(testUser);
+                        await context.SaveChangesAsync();
+
+                        List<ApplicationRole> roles = await context.Roles.AsNoTracking().ToListAsync();
+                        List<ApplicationUserRole> userRoles = new(roles.Count);
+                        foreach (var role in roles)
+                        {
+                            userRoles.Add(new ApplicationUserRole
+                            {
+                                ApplicationUserId = testUser.Id,
+                                ApplicationRoleId = role.Id
+                            });
+                        }
+
+                        await context.UserRoles.AddRangeAsync(userRoles);
+                        await context.SaveChangesAsync();
+
+                        List<Menu> menus = await context.Menus.AsNoTracking().ToListAsync();
+                        List<UserMenu> userMenus = new(menus.Count);
+                        foreach (var menu in menus)
+                        {
+                            userMenus.Add(new UserMenu
+                            {
+                                ApplicationUserId = testUser.Id,
+                                MenuId = menu.Id,
+                            });
+                        }
+
+                        await context.UserMenus.AddRangeAsync(userMenus);
+                        await context.SaveChangesAsync();
+                    }
+
+
+                    // Test 3
+                    if (await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username.ToUpper() == "TESTUSER3") is null)
+                    {
+                        var testUser = new ApplicationUser
+                        {
+                            Username = "testuser3",
+                            Login = "testuser3",
+                            EmailAddress = "bluewash.testuser3@example.com",
+                            PasswordHash = BCrypt.Net.BCrypt.HashPassword("123"),
+                        };
+
+                        await context.Users.AddAsync(testUser);
+                        await context.SaveChangesAsync();
+
+                        List<ApplicationRole> roles = await context.Roles.AsNoTracking().ToListAsync();
+                        List<ApplicationUserRole> userRoles = new(roles.Count);
+                        foreach (var role in roles)
+                        {
+                            userRoles.Add(new ApplicationUserRole
+                            {
+                                ApplicationUserId = testUser.Id,
+                                ApplicationRoleId = role.Id
+                            });
+                        }
+
+                        await context.UserRoles.AddRangeAsync(userRoles);
+                        await context.SaveChangesAsync();
+
+                        List<Menu> menus = await context.Menus.AsNoTracking().ToListAsync();
+                        List<UserMenu> userMenus = new(menus.Count);
+                        foreach (var menu in menus)
+                        {
+                            userMenus.Add(new UserMenu
+                            {
+                                ApplicationUserId = testUser.Id,
+                                MenuId = menu.Id,
+                            });
+                        }
+
+                        await context.UserMenus.AddRangeAsync(userMenus);
+                        await context.SaveChangesAsync();
+                    }
+
+                    /* End Test */
 
 
                     await transaction.CommitAsync();

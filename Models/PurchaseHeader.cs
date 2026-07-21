@@ -1,15 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 using WebAPI.Models.Common;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebAPI.Data.Enum;
 
 namespace WebAPI.Models
 {
     [Table("purchase_header")]
-    [Index(nameof(PurchaseNo), IsUnique = true)]
-    public class PurchaseHeader : IValidatableObject, IAuditable
+    public class PurchaseHeader : IAuditable
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
@@ -23,14 +22,26 @@ namespace WebAPI.Models
         public DateOnly PurchaseDate { get; set; }
 
         [Required]
+        [EnumDataType(typeof(EntryStatus))]
+        public string Status { get; set; } = EntryStatus.Draft.ToString();
+
+        [Required]
+        [EnumDataType(typeof(StatusPayment))]
+        public string PaymentStatus { get; set; } = StatusPayment.Unpaid.ToString();
+
+        [Required]
         public virtual Supplier Supplier { get; set; } = default!;
         public Guid SupplierId { get; set; }
 
         [DisplayName("Deskripsi")]
         public string? Description { get; set; }
 
-        // FK - Purchase Detail
+        [Required]
+        [EnumDataType(typeof(PaymentTerm))]
+        public string PaymentTerm { get; set; } = default!;
+
         public ICollection<PurchaseDetail>? PurchaseDetails { get; set; }
+        public ICollection<PurchasePayment>? PurchasePayments { get; set; }
 
         [DisplayName("Mata Uang")]
         public virtual Currency? Currency { get; set; }
@@ -41,13 +52,5 @@ namespace WebAPI.Models
         public string? CreatedBy { get; set; }
         public DateTime? LastModified { get; set; }
         public string? LastModifiedBy { get; set; }
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (Supplier.Currency is not null && Currency is null)
-            {
-                yield return new ValidationResult("Mata Uang tidak boleh kosong apabila mata uang pemasok telah ditentukan.", new string[] { nameof(Supplier.Currency), nameof(Currency) });
-            }
-        }
     }
 }

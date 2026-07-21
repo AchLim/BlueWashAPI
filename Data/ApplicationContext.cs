@@ -31,12 +31,13 @@ namespace WebAPI.Data
             modelBuilder.SeedChartOfAccount();
             modelBuilder.SeedLaundryServiceAndPriceMenu();
             modelBuilder.SeedMenu();
+            modelBuilder.SeedCompany();
 
-            modelBuilder.Entity<PriceMenu>()
-                        .HasKey(pm => new { pm.LaundryServiceId, pm.PriceMenuId });
-
-            modelBuilder.Entity<SalesDetail>()
-                        .HasKey(sd => new { sd.SalesHeaderId, sd.SalesDetailId });
+            modelBuilder.Entity<JournalEntry>()
+                        .HasOne(je => je.ClosingEntry)
+                        .WithMany(ce => ce.JournalEntries)
+                        .IsRequired(false)
+                        .OnDelete(DeleteBehavior.ClientCascade);
 
             modelBuilder.Entity<SalesDetail>()
                         .HasOne(sd => sd.PriceMenu)
@@ -44,6 +45,12 @@ namespace WebAPI.Data
                         .HasForeignKey(sd => new { sd.LaundryServiceId, sd.PriceMenuId })
                         .IsRequired()
                         .OnDelete(DeleteBehavior.ClientCascade);
+
+            modelBuilder.Entity<PurchasePayment>()
+                        .ToTable(tb => tb.HasTrigger("trgUpdatePurchaseHeaderPaymentStatus"));
+
+            modelBuilder.Entity<SalesPayment>()
+                        .ToTable(tb => tb.HasTrigger("trgUpdateSalesHeaderPaymentStatus"));
 
             base.OnModelCreating(modelBuilder);
         }
@@ -95,23 +102,28 @@ namespace WebAPI.Data
         #endregion
 
         #region Database Sets
-        public DbSet<ApplicationUser> Users { get; set; }
-        public DbSet<ApplicationRole> Roles { get; set; }
-        public DbSet<ApplicationUserRole> UserRoles { get; set; }
-        public DbSet<MenuCategory> MenuCategories { get; set; }
-        public DbSet<Menu> Menus { get; set; }
-        public DbSet<UserMenu> UserMenus { get; set; }
+
+        public DbSet<Company> Companies { get; set; } = default!;
+        public DbSet<ApplicationUser> Users { get; set; } = default!;
+        public DbSet<ApplicationRole> Roles { get; set; } = default!;
+        public DbSet<ApplicationUserRole> UserRoles { get; set; } = default!;
+        public DbSet<MenuCategory> MenuCategories { get; set; } = default!;
+        public DbSet<Menu> Menus { get; set; } = default!;
+        public DbSet<UserMenu> UserMenus { get; set; } = default!;
         public DbSet<ChartOfAccount> ChartOfAccounts { get; set; } = default!;
         public DbSet<Currency> Currencies { get; set; } = default!;
         public DbSet<Customer> Customers { get; set; } = default!;
         public DbSet<JournalItem> JournalItems { get; set; } = default!;
+        public DbSet<ClosingEntry> ClosingEntries { get; set; } = default!;
         public DbSet<JournalEntry> JournalEntries { get; set; } = default!;
         public DbSet<Inventory> Inventories { get; set; } = default!;
+        public DbSet<PurchasePayment> PurchasePayments { get; set; } = default!;
         public DbSet<PurchaseDetail> PurchaseDetails { get; set; } = default!;
         public DbSet<PurchaseHeader> PurchaseHeaders { get; set; } = default!;
         public DbSet<SalesDetail> SalesDetails { get; set; } = default!;
         public DbSet<SalesHeader> SalesHeaders { get; set; } = default!;
         public DbSet<SalesPayment> SalesPayments { get; set; } = default!;
+        public DbSet<MessageTemplate> MessageTemplates { get; set; } = default!;
         public DbSet<Supplier> Suppliers { get; set; } = default!;
         public DbSet<LaundryService> LaundryServices { get; set; } = default!;
         public DbSet<PriceMenu> PriceMenus { get; set; } = default!;

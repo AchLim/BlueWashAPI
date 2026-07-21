@@ -58,6 +58,12 @@ namespace WebAPI.DAL
 
         public async Task InsertSupplier(Supplier supplier)
         {
+            if (supplier.SupplierName.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nama pemasok tidak boleh kosong!", null);
+
+            if (supplier.SupplierCode.Trim() == string.Empty)
+                throw new DatabaseInsertException("Kode pemasok tidak boleh kosong!", null);
+
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
@@ -84,6 +90,12 @@ namespace WebAPI.DAL
 
         public async Task UpdateSupplier(Supplier supplier)
         {
+            if (supplier.SupplierName.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nama pemasok tidak boleh kosong!", null);
+
+            if (supplier.SupplierCode.Trim() == string.Empty)
+                throw new DatabaseInsertException("Kode pemasok tidak boleh kosong!", null);
+
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try

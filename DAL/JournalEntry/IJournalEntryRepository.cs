@@ -11,6 +11,10 @@ namespace WebAPI.DAL
         Task DeleteJournalEntry(JournalEntry journalEntry);
 
 
-        Task<IEnumerable<JournalEntryContainer>> GetJournalEntryData();
+        //Task<IEnumerable<JournalEntryContainer>> GetJournalEntryData();
+
+        Task<IEnumerable<PurchaseEntryContainer>> GetPurchaseQueryById(Guid purchaseHeaderId);
+        Task<IEnumerable<SalesEntryContainer>> GetSalesQueryById(Guid salesHeaderId);
+        Task<bool> ClosingEntryExist(DateOnly transactionDate);
     }
 }

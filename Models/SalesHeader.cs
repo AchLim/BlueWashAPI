@@ -3,12 +3,12 @@ using WebAPI.Models.Common;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebAPI.Data.Enum;
 
 namespace WebAPI.Models
 {
     [Table("sales_header")]
-    [Index(nameof(SalesNo), IsUnique = true)]
-    public class SalesHeader : IAuditable, IValidatableObject
+    public class SalesHeader : IAuditable
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
@@ -22,19 +22,25 @@ namespace WebAPI.Models
         public DateOnly SalesDate { get; set; }
 
         [Required]
+        [EnumDataType(typeof(EntryStatus))]
+        public string Status { get; set; } = EntryStatus.Draft.ToString();
+
+        [Required]
+        [EnumDataType(typeof(StatusPayment))]
+        public string PaymentStatus { get; set; } = StatusPayment.Unpaid.ToString();
+
+        [Required]
         public virtual Customer Customer { get; set; } = default!;
         public Guid CustomerId { get; set; }
-
-        [DisplayName("Kode Pelanggan")]
-        public string CustomerCode => Customer.CustomerCode;
 
         [DisplayName("Deskripsi")]
         public string? Description { get; set; }
 
-        // FK - Sales Detail
-        public ICollection<SalesDetail>? SalesDetails { get; set; }
+        [Required]
+        [EnumDataType(typeof(PaymentTerm))]
+        public string PaymentTerm { get; set; } = default!;
 
-        // FK - Sales Payment
+        public ICollection<SalesDetail>? SalesDetails { get; set; }
         public ICollection<SalesPayment>? SalesPayments { get; set; }
 
         [DisplayName("Mata Uang")]
@@ -47,13 +53,5 @@ namespace WebAPI.Models
         public string? CreatedBy { get; set; }
         public DateTime? LastModified { get; set; }
         public string? LastModifiedBy { get; set; }
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (Customer.Currency is not null && Currency is null)
-            {
-                yield return new ValidationResult("Mata Uang tidak boleh kosong apabila mata uang pelanggan telah ditentukan.", new string[] { nameof(Customer.Currency), nameof(Currency) });
-            }
-        }
     }
 }

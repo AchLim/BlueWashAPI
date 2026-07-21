@@ -2,7 +2,7 @@
 {
     public class DatabaseDeleteException : System.Exception
     {
-        public DatabaseDeleteException(string? message, System.Exception? innerException) : base(message, innerException)
+        public DatabaseDeleteException(string? message, System.Exception? innerException = null) : base(message, innerException)
         {
         }
     }

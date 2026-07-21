@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DAL;
+using WebAPI.Data.Enum;
+using WebAPI.Exception;
 using WebAPI.Models;
 using WebAPI.Models.DTO;
 using WebAPI.Models.Mapper;
@@ -23,7 +25,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("header/all")]
-        public async Task<ActionResult<PurchaseHeader>> GetAllJournalEntriesAsync()
+        public async Task<ActionResult<PurchaseHeader>> GetAllPurchaseHeaders()
         {
             IEnumerable<PurchaseHeader> journalEntries = await _purchaseRepository.GetAllPurchaseHeaders();
             return Ok(journalEntries);
@@ -71,25 +73,24 @@ namespace WebAPI.Controllers
             if (purchaseHeader is null)
                 return BadRequest($"Data pembelian dengan id: {id} tidak ditemukan!");
 
+            if (purchaseHeader.Status == EntryStatus.Posted.ToString())
+            {
+                throw new DatabaseDeleteException("Tidak dapat menghapus pembelian yang sudah di posting!");
+            }
+
             await _purchaseRepository.DeletePurchaseHeader(purchaseHeader);
 
             return Ok();
         }
-        
-        [HttpGet("get_total_item_purchase")]
-        [AllowAnonymous]
-        public async Task<ActionResult<ItemPurchaseContainer>> GetTotalItemPurchase()
+
+        [HttpGet("payment/all")]
+        public async Task<ActionResult<PurchasePayment>> GetAllPurchasePayments()
         {
-            IEnumerable<ItemPurchaseContainer> totalItemPurchase = await _purchaseRepository.GetTotalItemPurchaseData();
-            return Ok(totalItemPurchase);
+            IEnumerable<PurchasePayment> purchasePayments = await _purchaseRepository.GetAllPurchasePayments();
+            return Ok(purchasePayments);
         }
 
-        [HttpGet("get_total_purchase_per_invoice")]
-        [AllowAnonymous]
-        public async Task<ActionResult<SalesPerInvoiceContainer>> GetTotalPurchasePerInvoice()
-        {
-            IEnumerable<PurchasePerInvoiceContainer> purchasePerInvoices = await _purchaseRepository.GetTotalPurchasePerInvoiceData();
-            return Ok(purchasePerInvoices);
-        }
+
+
     }
 }

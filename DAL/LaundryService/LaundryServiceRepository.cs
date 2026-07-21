@@ -23,7 +23,9 @@ namespace WebAPI.DAL
             {
                 try
                 {
-                    laundryServices = await _context.LaundryServices.ToListAsync();
+                    laundryServices = await _context.LaundryServices
+                                                    .Include(ls => ls.PriceMenus)
+                                                    .ToListAsync();
                 }
                 catch (System.Exception ex)
                 {
@@ -42,7 +44,9 @@ namespace WebAPI.DAL
             {
                 try
                 {
-                    laundryService = await _context.LaundryServices.Include(ls => ls.PriceMenus).FirstOrDefaultAsync(ls => ls.Id == id);
+                    laundryService = await _context.LaundryServices
+                                                   .Include(ls => ls.PriceMenus)
+                                                   .FirstOrDefaultAsync(ls => ls.Id == id);
                 }
                 catch (System.Exception ex)
                 {
@@ -56,6 +60,9 @@ namespace WebAPI.DAL
 
         public async Task InsertLaundryService(LaundryService laundryService)
         {
+            if (laundryService.Name.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nama Tipe tidak boleh kosong!", null);
+
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
@@ -74,6 +81,9 @@ namespace WebAPI.DAL
 
         public async Task UpdateLaundryService(LaundryService laundryService)
         {
+            if (laundryService.Name.Trim() == string.Empty)
+                throw new DatabaseInsertException("Nama Tipe tidak boleh kosong!", null);
+
             await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
